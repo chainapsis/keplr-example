@@ -3,6 +3,8 @@ const { AccAddress } = require("@chainapsis/cosmosjs/common/address");
 const { Coin } = require("@chainapsis/cosmosjs/common/coin");
 const { MsgSend } = require("@chainapsis/cosmosjs/x/bank");
 
+const {defaultBech32Config} = require("@chainapsis/cosmosjs/core/bech32Config");
+
 window.onload = async () => {
     // Keplr extension injects the wallet provider that is compatible with chainapsis's cosmosJS.
     // You can get this wallet provider from `window.cosmosJSWalletProvider` after load event.
@@ -13,10 +15,12 @@ window.onload = async () => {
 
     // Initialize the gaia api with the wallet provider that is injected by Keplr extension.
     const cosmosJS = new GaiaApi({
-        chainId: "cosmoshub-3",
+        chainId: "secret-1",
         walletProvider: window.cosmosJSWalletProvider,
-        rpc: "https://node-cosmoshub-3.keplr.app/rpc",
-        rest: "https://node-cosmoshub-3.keplr.app/rest"
+        rpc: "https://node-secret-1.keplr.app/rpc",
+        rest: "https://node-secret-1.keplr.app/rest"
+    }, {
+        bech32Config: defaultBech32Config("secret")
     });
 
     // You should request Keplr to enable the wallet.
@@ -37,7 +41,7 @@ document.sendForm.onsubmit = () => {
 
     try {
         // Parse bech32 address and validate it.
-        recipient = AccAddress.fromBech32(recipient, "cosmos");
+        recipient = AccAddress.fromBech32(recipient, "secret");
     } catch {
         alert("Invalid bech32 address");
         return false;
@@ -55,10 +59,12 @@ document.sendForm.onsubmit = () => {
     (async () => {
         // See above.
         const cosmosJS = new GaiaApi({
-            chainId: "cosmoshub-3",
+            chainId: "secret-1",
             walletProvider: window.cosmosJSWalletProvider,
-            rpc: "https://node-cosmoshub-3.keplr.app/rpc",
-            rest: "https://node-cosmoshub-3.keplr.app/rest"
+            rpc: "https://node-secret-1.keplr.app/rpc",
+            rest: "https://node-secret-1.keplr.app/rest"
+        }, {
+            bech32Config: defaultBech32Config("secret")
         });
 
         // See above.
@@ -66,10 +72,10 @@ document.sendForm.onsubmit = () => {
 
         // Get the user's key.
         // And, parse bech32 address and validate it.
-        const sender = AccAddress.fromBech32((await cosmosJS.getKeys())[0].bech32Address, "cosmos");
+        const sender = AccAddress.fromBech32((await cosmosJS.getKeys())[0].bech32Address, "secret");
 
         // Make send message for bank module.
-        const msg = new MsgSend(sender, recipient, [new Coin("uatom", amount)]);
+        const msg = new MsgSend(sender, recipient, [new Coin("uscrt", amount)]);
 
         // Request sending messages.
         // Fee will be set by the Keplr extension.
@@ -77,7 +83,7 @@ document.sendForm.onsubmit = () => {
         const result = await cosmosJS.sendMsgs([msg], {
             gas: 100000,
             memo: "",
-            fee: new Coin("uatom", 1)
+            fee: new Coin("uscrt", 1)
         }, "sync");
 
         if (result.code !== undefined &&
