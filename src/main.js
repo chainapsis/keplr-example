@@ -1,7 +1,11 @@
 const { GaiaApi } = require("@chainapsis/cosmosjs/gaia/api");
 const { AccAddress } = require("@chainapsis/cosmosjs/common/address");
 const { Coin } = require("@chainapsis/cosmosjs/common/coin");
-const { MsgSend } = require("@chainapsis/cosmosjs/x/bank");
+const { MsgExecuteContract } = require("@chainapsis/cosmosjs/x/wasm");
+
+const { defaultBech32Config } = require("@chainapsis/cosmosjs/core/bech32Config");
+
+const cw20ContractAddress = "coral18vd8fpwxzck93qlwghaj6arh4p7c5n89du58z4";
 
 window.onload = async () => {
     // Keplr extension injects the wallet provider that is compatible with chainapsis's cosmosJS.
@@ -13,10 +17,12 @@ window.onload = async () => {
 
     // Initialize the gaia api with the wallet provider that is injected by Keplr extension.
     const cosmosJS = new GaiaApi({
-        chainId: "cosmoshub-3",
+        chainId: "test-1",
         walletProvider: window.cosmosJSWalletProvider,
-        rpc: "https://node-cosmoshub-3.keplr.app/rpc",
-        rest: "https://node-cosmoshub-3.keplr.app/rest"
+        rpc: "http://127.0.0.1:26657",
+        rest: "http://127.0.0.1:1317"
+    }, {
+        bech32Config: defaultBech32Config("coral")
     });
 
     // You should request Keplr to enable the wallet.
@@ -37,7 +43,7 @@ document.sendForm.onsubmit = () => {
 
     try {
         // Parse bech32 address and validate it.
-        recipient = AccAddress.fromBech32(recipient, "cosmos");
+        recipient = AccAddress.fromBech32(recipient, "coral");
     } catch {
         alert("Invalid bech32 address");
         return false;
@@ -55,10 +61,12 @@ document.sendForm.onsubmit = () => {
     (async () => {
         // See above.
         const cosmosJS = new GaiaApi({
-            chainId: "cosmoshub-3",
+            chainId: "test-1",
             walletProvider: window.cosmosJSWalletProvider,
-            rpc: "https://node-cosmoshub-3.keplr.app/rpc",
-            rest: "https://node-cosmoshub-3.keplr.app/rest"
+            rpc: "http://127.0.0.1:26657",
+            rest: "http://127.0.0.1:1317"
+        }, {
+            bech32Config: defaultBech32Config("coral")
         });
 
         // See above.
@@ -66,18 +74,23 @@ document.sendForm.onsubmit = () => {
 
         // Get the user's key.
         // And, parse bech32 address and validate it.
-        const sender = AccAddress.fromBech32((await cosmosJS.getKeys())[0].bech32Address, "cosmos");
+        const sender = AccAddress.fromBech32((await cosmosJS.getKeys())[0].bech32Address, "coral");
 
         // Make send message for bank module.
-        const msg = new MsgSend(sender, recipient, [new Coin("uatom", amount)]);
+        const msg = new MsgExecuteContract(sender, AccAddress.fromBech32(cw20ContractAddress, "coral"), {
+            transfer: {
+                recipient: recipient.toBech32(),
+                amount: amount.toString()
+            }
+        }, []);
 
         // Request sending messages.
         // Fee will be set by the Keplr extension.
         // The gas adjustment has not been implemented yet, so please set the gas manually.
         const result = await cosmosJS.sendMsgs([msg], {
-            gas: 100000,
+            gas: 150000,
             memo: "",
-            fee: new Coin("uatom", 1)
+            fee: new Coin("coral", 1)
         }, "sync");
 
         if (result.code !== undefined &&
