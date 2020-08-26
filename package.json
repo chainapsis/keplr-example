@@ -16,11 +16,11 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@chainapsis/cosmosjs": "0.0.3-alpha.3",
-    "@cosmjs/crypto": "^0.21.1",
-    "@cosmjs/encoding": "^0.21.1",
-    "@cosmjs/math": "^0.21.1",
-    "@cosmjs/utils": "^0.21.1",
+    "@cosmjs/launchpad": "git+https://github.com/Thunnini/cosmjs-dist.git#9cd99f4",
+    "@cosmjs/crypto": "^0.22.2",
+    "@cosmjs/encoding": "^0.22.2",
+    "@cosmjs/math": "git+https://github.com/Thunnini/cosmjs-math-dist.git#4dce038",
+    "@cosmjs/utils": "^0.22.2",
     "axios": "^0.19.0",
     "fast-deep-equal": "^3.1.1"
   }
