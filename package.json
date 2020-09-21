@@ -16,6 +16,6 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@chainapsis/cosmosjs": "git+https://github.com/everett-protocol/cosmosjs-dist.git#ec3e754"
+    "@chainapsis/cosmosjs": "git+https://github.com/everett-protocol/cosmosjs-dist.git#9e94261"
   }
 }
