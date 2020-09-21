@@ -16,38 +16,39 @@ window.onload = async () => {
     } else {
         if (window.keplr && window.keplr.experimentalSuggestChain) {
             try {
-                // Keplr experimentally supports the feature that suggests the chain from webpage after version v0.6.4.
-                // And, if the user approves it, it will be added to the Keplr extension.
-                // If the user rejects it or your suggested chain information doesn't include the required fields, it will throw an error.
+                // Keplr v0.6.4 introduces an experimental feature that supports the feature to suggests the chain from a webpage.
+                // If the user approves, the chain will be added to the user's Keplr extension.
+                // If the user rejects it or the suggested chain information doesn't include the required fields, it will throw an error.
                 // If the same chain id is already registered, it will resolve and not require the user interactions.
                 await window.keplr.experimentalSuggestChain({
-                    // Chain id of the chain.
+                    // Chain-id of the Cosmos SDK chain.
                     chainId: "cosmwasm-coral",
                     // The name of the chain to be displayed to the user.
                     chainName: "Coral",
-                    // Rpc endpoint for the chain.
+                    // RPC endpoint of the chain.
                     rpc: "https://rpc.coralnet.cosmwasm.com",
-                    // Rest endpoint for the chain.
+                    // REST endpoint of the chain.
                     rest: "https://lcd.coralnet.cosmwasm.com",
-                    // Coin that can be used for staking purposes
-                    // But, currently, keplr doesn't have the UI that shows the tokens, so just pass it as the fee token.
+                    // Staking coin information
+                    // (Currently, Keplr doesn't have the UI that shows multiple tokens, therefore this uses the SHELL token as the primary token althought SHELL is not a staking coin.)
                     stakeCurrency: {
-                        // The coin denomination to be displayed to the user.
+                        // Coin denomination to be displayed to the user.
                         coinDenom: "SHELL",
-                        // The actual coin denomination used in chain itself.
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "ushell",
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
-                        // Optinally, keplr can show the fiat value of the coin if coin gecko id is provided.
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
                         // coinGeckoId: ""
                     },
-                    // If you have the wallet webpage to be used to stake the coin and this field is provided.
-                    // Keplr will show the button to link this webpage.
+                    // (Optional) If you have a wallet webpage used to stake the coin then provide the url to the website in `walletUrlForStaking`.
+                    // The 'stake' button in Keplr extension will link to the webpage.
                     // walletUrlForStaking: "",
                     // The BIP44 path.
                     bip44: {
                         // You can only set the coin type of BIP44.
-                        // Purpose is fixed to 44.
+                        // 'Purpose' is fixed to 44.
                         coinType: 118,
                     },
                     // Bech32 configuration to show the address to user.
@@ -61,32 +62,34 @@ window.onload = async () => {
                     //   bech32PrefixConsPub: string;
                     // }
                     bech32Config: defaultBech32Config("coral"),
-                    // All coin/tokens used in this chain.
+                    // List of all coin/tokens used in this chain.
                     currencies: [{
-                        // The coin denomination to be displayed to the user.
+                        // Coin denomination to be displayed to the user.
                         coinDenom: "SHELL",
-                        // The actual coin denomination used in chain itself.
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "ushell",
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
-                        // Optinally, keplr can show the fiat value of the coin if coin gecko id is provided.
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
                         // coinGeckoId: ""
                     }],
-                    // All coin/tokens used as fee in this chain.
+                    // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
-                        // The coin denomination to be displayed to the user.
+                        // Coin denomination to be displayed to the user.
                         coinDenom: "SHELL",
-                        // The actual coin denomination used in chain itself.
+                        // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "ushell",
+                        // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
-                        // Optinally, keplr can show the fiat value of the coin if coin gecko id is provided.
+                        // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
                         // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
                         // coinGeckoId: ""
                     }],
-                    // The number of the coin type.
+                    // (Optional) The number of the coin type.
                     // This field is only used to fetch the address from ENS.
                     // Ideally, it is recommended to be the same with BIP44 path's coin type.
-                    // But, some early chain uses the BIP44 path as 118 which is the coin type of Cosmos Hub.
+                    // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
                     // So, this is separated to support such chains.
                     // coinType: 118,
                 });
