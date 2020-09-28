@@ -1,11 +1,11 @@
-const { SigningCosmosClient } = require("./cosmjs/sdk38");
+const { SigningCosmosClient } = require("@cosmjs/launchpad");
 
 window.onload = async () => {
-    // Keplr extension injects the wallet provider that is compatible with cosmJS.
-    // You can get this wallet provider from `window.getCosmJSWalletProvider(chainId:string)` after load event.
+    // Keplr extension injects the offline signer that is compatible with cosmJS.
+    // You can get this offline signer from `window.getOfflineSigner(chainId:string)` after load event.
     // And it also injects the helper function to `window.keplr`.
-    // If `window.getCosmJSWalletProvider` or `window.keplr` is null, Keplr extension may be not installed on browser.
-    if (!window.getCosmJSWalletProvider || !window.keplr) {
+    // If `window.getOfflineSigner` or `window.keplr` is null, Keplr extension may be not installed on browser.
+    if (!window.getOfflineSigner || !window.keplr) {
         alert("Please install keplr extension");
     }
 
@@ -17,21 +17,19 @@ window.onload = async () => {
     // If you don't request enabling before usage, there is no guarantee that other methods will work.
     await window.keplr.enable(chainId);
 
-    const walletProvider = window.getCosmJSWalletProvider(chainId);
+    const offlineSigner = window.getOfflineSigner(chainId);
 
     // You can get the address/public keys by `getAccounts` method.
     // It can return the array of address/public key.
     // But, currently, Keplr extension manages only one address/public key pair.
     // XXX: This line is needed to set the sender address for SigningCosmosClient.
-    const accounts = await walletProvider.getAccounts();
+    const accounts = await offlineSigner.getAccounts();
 
-    console.log(accounts)
-
-    // Initialize the gaia api with the wallet provider that is injected by Keplr extension.
+    // Initialize the gaia api with the offline signer that is injected by Keplr extension.
     const cosmJS = new SigningCosmosClient(
         "https://node-cosmoshub-3.keplr.app/rest",
         accounts[0].address,
-        walletProvider,
+        offlineSigner,
     );
 
     document.getElementById("address").append(accounts[0].address);
@@ -54,24 +52,15 @@ document.sendForm.onsubmit = () => {
         // See above.
         const chainId = "cosmoshub-3";
         await window.keplr.enable(chainId);
-        const walletProvider = window.getCosmJSWalletProvider(chainId);
+        const offlineSigner = window.getOfflineSigner(chainId);
 
-        const accounts = await walletProvider.getAccounts();
+        const accounts = await offlineSigner.getAccounts();
 
-        // Initialize the gaia api with the wallet provider that is injected by Keplr extension.
+        // Initialize the gaia api with the offline signer that is injected by Keplr extension.
         const cosmJS = new SigningCosmosClient(
             "https://node-cosmoshub-3.keplr.app/rest",
             accounts[0].address,
-            walletProvider,
-            {
-                send: {
-                    amount: [{
-                        denom: "uatom",
-                        amount: "5000"
-                    }],
-                    gas: "80000",
-                }
-            }
+            offlineSigner
         );
 
         const result = await cosmJS.sendTokens(recipient, [{
@@ -79,12 +68,14 @@ document.sendForm.onsubmit = () => {
             amount: amount.toString(),
         }]);
 
+        console.log(result);
+
         if (result.code !== undefined &&
             result.code !== 0) {
-            alert("Failed to send tx: " + result.log);
+            alert("Failed to send tx: " + result.log || result.rawLog);
+        } else {
+            alert("Succeed to send tx");
         }
-
-        alert("Succeed to send tx");
     })();
 
     return false;
