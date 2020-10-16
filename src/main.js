@@ -54,7 +54,14 @@ window.onload = async () => {
                     //   bech32PrefixConsAddr: string;
                     //   bech32PrefixConsPub: string;
                     // }
-                    bech32Config: defaultBech32Config("cosmos"),
+                    bech32Config: {
+                        bech32PrefixAccAddr: "cosmos",
+                        bech32PrefixAccPub: "cosmospub",
+                        bech32PrefixValAddr: "cosmosvaloper",
+                        bech32PrefixValPub: "cosmosvaloperpub",
+                        bech32PrefixConsAddr: "cosmosvalcons",
+                        bech32PrefixConsPub: "cosmosvalconspub"
+                    },
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
