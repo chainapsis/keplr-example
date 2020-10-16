@@ -16,6 +16,9 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@chainapsis/cosmosjs": "0.0.3-alpha.3"
+    "@chainapsis/cosmosjs": "0.0.3-alpha.3",
+    "@cosmjs/launchpad": "^0.23.0-alpha.0",
+    "axios": "^0.19.0",
+    "fast-deep-equal": "^3.1.1"
   }
 }
