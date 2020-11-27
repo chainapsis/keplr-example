@@ -1,4 +1,5 @@
-const { SigningCosmosClient } = require("@cosmjs/launchpad");
+const { SigningStargateClient } = require("@cosmjs/stargate");
+const {GasPrice} = require("@cosmjs/launchpad");
 
 window.onload = async () => {
     // Keplr extension injects the offline signer that is compatible with cosmJS.
@@ -18,19 +19,19 @@ window.onload = async () => {
                 // If the same chain id is already registered, it will resolve and not require the user interactions.
                 await window.keplr.experimentalSuggestChain({
                     // Chain-id of the Cosmos SDK chain.
-                    chainId: "cosmoshub-3",
+                    chainId: "test",
                     // The name of the chain to be displayed to the user.
-                    chainName: "Cosmos",
+                    chainName: "Test",
                     // RPC endpoint of the chain.
-                    rpc: "https://node-cosmoshub-3.keplr.app/rpc",
+                    rpc: "http://localhost:26657",
                     // REST endpoint of the chain.
-                    rest: "https://node-cosmoshub-3.keplr.app/rest",
+                    rest: "http://localhost:1317",
                     // Staking coin information
                     stakeCurrency: {
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "ATOM",
+                        coinDenom: "STAKE",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uatom",
+                        coinMinimalDenom: "stake",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -67,9 +68,9 @@ window.onload = async () => {
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "ATOM",
+                        coinDenom: "STAKE",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uatom",
+                        coinMinimalDenom: "stake",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -79,9 +80,9 @@ window.onload = async () => {
                     // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "ATOM",
+                        coinDenom: "STAKE",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-                        coinMinimalDenom: "uatom",
+                        coinMinimalDenom: "stake",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
                         coinDecimals: 6,
                         // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -102,7 +103,8 @@ window.onload = async () => {
                         low: 0.01,
                         average: 0.025,
                         high: 0.04
-                    }
+                    },
+                    features: ["stargate"]
                 });
             } catch {
                 alert("Failed to suggest the chain");
@@ -112,7 +114,7 @@ window.onload = async () => {
         }
     }
 
-    const chainId = "cosmoshub-3";
+    const chainId = "test";
 
     // You should request Keplr to enable the wallet.
     // This method will ask the user whether or not to allow access if they haven't visited this website.
@@ -129,9 +131,8 @@ window.onload = async () => {
     const accounts = await offlineSigner.getAccounts();
 
     // Initialize the gaia api with the offline signer that is injected by Keplr extension.
-    const cosmJS = new SigningCosmosClient(
-        "https://node-cosmoshub-3.keplr.app/rest",
-        accounts[0].address,
+    const cosmJS = await SigningStargateClient.connectWithWallet(
+        "http://localhost:26657",
         offlineSigner,
     );
 
@@ -153,21 +154,23 @@ document.sendForm.onsubmit = () => {
 
     (async () => {
         // See above.
-        const chainId = "cosmoshub-3";
+        const chainId = "test";
         await window.keplr.enable(chainId);
         const offlineSigner = window.getOfflineSigner(chainId);
 
         const accounts = await offlineSigner.getAccounts();
 
         // Initialize the gaia api with the offline signer that is injected by Keplr extension.
-        const cosmJS = new SigningCosmosClient(
-            "https://node-cosmoshub-3.keplr.app/rest",
-            accounts[0].address,
-            offlineSigner
+        const cosmJS = await SigningStargateClient.connectWithWallet(
+            "http://localhost:26657",
+            offlineSigner,
+            {
+                gasPrice: GasPrice.fromString("0.025stake")
+            }
         );
 
-        const result = await cosmJS.sendTokens(recipient, [{
-            denom: "uatom",
+        const result = await cosmJS.sendTokens(accounts[0].address, recipient, [{
+            denom: "stake",
             amount: amount.toString(),
         }]);
 
