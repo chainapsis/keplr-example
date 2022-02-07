@@ -11,20 +11,20 @@ window.onload = async () => {
         if (window.keplr.experimentalSuggestChain) {
             try {
                 // Keplr v0.6.4 introduces an experimental feature that supports the feature to suggests the chain from a webpage.
-                // cosmoshub-3 is integrated to Keplr so the code should return without errors.
-                // The code below is not needed for cosmoshub-3, but may be helpful if you’re adding a custom chain.
+                // cosmoshub-4 is integrated to Keplr so the code should return without errors.
+                // The code below is not needed for cosmoshub-4, but may be helpful if you’re adding a custom chain.
                 // If the user approves, the chain will be added to the user's Keplr extension.
                 // If the user rejects it or the suggested chain information doesn't include the required fields, it will throw an error.
                 // If the same chain id is already registered, it will resolve and not require the user interactions.
                 await window.keplr.experimentalSuggestChain({
                     // Chain-id of the Cosmos SDK chain.
-                    chainId: "cosmoshub-3",
+                    chainId: "cosmoshub-4",
                     // The name of the chain to be displayed to the user.
                     chainName: "Cosmos",
                     // RPC endpoint of the chain.
-                    rpc: "https://node-cosmoshub-3.keplr.app/rpc",
+                    rpc: "https://node-cosmoshub-4.keplr.app/rpc",
                     // REST endpoint of the chain.
-                    rest: "https://node-cosmoshub-3.keplr.app/rest",
+                    rest: "https://node-cosmoshub-4.keplr.app/rest",
                     // Staking coin information
                     stakeCurrency: {
                         // Coin denomination to be displayed to the user.
@@ -112,7 +112,7 @@ window.onload = async () => {
         }
     }
 
-    const chainId = "cosmoshub-3";
+    const chainId = "cosmoshub-4";
 
     // You should request Keplr to enable the wallet.
     // This method will ask the user whether or not to allow access if they haven't visited this website.
@@ -130,7 +130,7 @@ window.onload = async () => {
 
     // Initialize the gaia api with the offline signer that is injected by Keplr extension.
     const cosmJS = new SigningCosmosClient(
-        "https://node-cosmoshub-3.keplr.app/rest",
+        "https://node-cosmoshub-4.keplr.app/rest",
         accounts[0].address,
         offlineSigner,
     );
@@ -153,7 +153,7 @@ document.sendForm.onsubmit = () => {
 
     (async () => {
         // See above.
-        const chainId = "cosmoshub-3";
+        const chainId = "cosmoshub-4";
         await window.keplr.enable(chainId);
         const offlineSigner = window.getOfflineSigner(chainId);
 
@@ -161,7 +161,7 @@ document.sendForm.onsubmit = () => {
 
         // Initialize the gaia api with the offline signer that is injected by Keplr extension.
         const cosmJS = new SigningCosmosClient(
-            "https://node-cosmoshub-3.keplr.app/rest",
+            "https://node-cosmoshub-4.keplr.app/rest",
             accounts[0].address,
             offlineSigner
         );
