@@ -1,6 +1,4 @@
-const {
-    SigningCosmosClient
-} = require("@cosmjs/launchpad");
+import { SigningCosmosClient } from '@cosmjs/launchpad'
 import {
     DirectSecp256k1HdWallet
 } from '@cosmjs/proto-signing'
@@ -192,7 +190,7 @@ document.sendForm.onsubmit = () => {
             result.code !== 0) {
             alert("Failed to send tx: " + result.log || result.rawLog);
         } else {
-            //alert("Succeed to send tx");
+            alert("Succeed to send tx:" + result.transactionHash);
         }
     })();
 
