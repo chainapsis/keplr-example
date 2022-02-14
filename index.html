@@ -13,26 +13,43 @@
     </head>
     <body>
         <div id="app">
-            <div class="container-sm">
-            <b>Address:</b>
-            <div id="address"></div>
-            <form name="sendForm">
-                <div class="form-group">
-                    <label for="recipient">Recipient</label>
-                    <input class="form-control" id="recipient" name="recipient">
-                </div>
-                <div class="form-group">
-                    <label for="amount">Amount</label>
-                    <div class="input-group">
-                        <input class="form-control" id="amount" name="amount">
-                        <div class="input-group-append">
-                            <div class="input-group-text">ATOM</div>
-                        </div>
+
+            <div class="container-sm ">
+                <div class="row">
+                    <div class="col p-5">
+                        <img src="keplr-logo.png" alt="" style="max-width: 200px;    margin: auto;display: block;">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <div class="card ">
+                <div class="card-header">
+                    Send Coin
+                </div>
+                <div class="card-body">
+
+                        <b>Address:</b>
+                        <div id="address"></div>
+                        <form name="sendForm">
+                            <div class="form-group">
+                                <label for="recipient">Recipient</label>
+                                <input class="form-control" id="recipient" name="recipient">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="amount" name="amount">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text">OSMO</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+
+                </div>
             </div>
+            </div>
+
+
         </div>
     </body>
 </html>
