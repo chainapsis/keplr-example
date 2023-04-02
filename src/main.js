@@ -143,7 +143,8 @@ window.onload = async () => {
         offlineSigner,
     );
 
-    //document.getElementById("address").append(accounts[0].address);
+    // Display address of sender
+    document.getElementById("address").append(accounts[0].address);
 };
 
 document.sendForm.onsubmit = () => {
@@ -184,7 +185,9 @@ document.sendForm.onsubmit = () => {
             gas: '200000',
         }
         const result = await client.sendTokens(accounts[0].address, recipient, [amountFinal], fee, "")
-        assertIsBroadcastTxSuccess(result)
+
+        // We have to uncommented to parse result manually
+        //assertIsBroadcastTxSuccess(result)
 
         if (result.code !== undefined &&
             result.code !== 0) {
