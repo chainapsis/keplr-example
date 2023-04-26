@@ -93,6 +93,15 @@ window.onload = async () => {
               // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
               // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
               // coinGeckoId: ""
+              // (Optional) This is used to set the fee of the transaction.
+              // If this field is not provided and suggesting chain is not natively integrated, Keplr extension will set the Keplr default gas price (low: 0.01, average: 0.025, high: 0.04).
+              // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
+              // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
+              gasPriceStep: {
+                low: 0.0025,
+                average: 0.025,
+                high: 0.04,
+              },
             },
           ],
           // (Optional) The number of the coin type.
@@ -101,15 +110,6 @@ window.onload = async () => {
           // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
           // So, this is separated to support such chains.
           coinType: 118,
-          // (Optional) This is used to set the fee of the transaction.
-          // If this field is not provided, Keplr extension will set the default gas price as (low: 0.01, average: 0.025, high: 0.04).
-          // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
-          // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
-          gasPriceStep: {
-            low: 0.01,
-            average: 0.025,
-            high: 0.04,
-          },
         });
       } catch {
         alert("Failed to suggest the chain");
@@ -166,6 +166,7 @@ document.sendForm.onsubmit = () => {
       ],
       gas: "200000",
     };
+
     const result = await client.sendTokens(
       accounts[0].address,
       recipient,
