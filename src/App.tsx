@@ -58,26 +58,17 @@ function App() {
     if (window.keplr) {
       const key = await window.keplr.getKey(OsmosisChainInfo.chainId);
 
-      const aminoMsgs = {
-        type: "cosmos-sdk/MsgSend",
-        value: {
-          from_address: key.bech32Address,
-          to_address: key.bech32Address,
+      const protoMsgs = {
+        typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+        value: MsgSend.encode({
+          fromAddress: key.bech32Address,
+          toAddress: key.bech32Address,
           amount: [
             {
               denom: "uosmo",
               amount: "10000",
             },
           ],
-        },
-      };
-
-      const protoMsgs = {
-        typeUrl: "/cosmos.bank.v1beta1.MsgSend",
-        value: MsgSend.encode({
-          fromAddress: aminoMsgs.value.from_address,
-          toAddress: aminoMsgs.value.to_address,
-          amount: aminoMsgs.value.amount,
         }).finish(),
       }
 
@@ -85,15 +76,13 @@ function App() {
         window.keplr,
         OsmosisChainInfo,
         key.bech32Address,
-        { amino: [aminoMsgs], proto: [protoMsgs]},
+        [protoMsgs],
         {
           amount: [{denom: "uosmo",
             amount: "236",}],
           gas: "94250",
         })
     }
-
-
   }
 
 
