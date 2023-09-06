@@ -81,8 +81,6 @@ export const fetchAccountInfo = async (chainInfo: ChainInfo, address: string) =>
   return response.account;
 }
 
-
-
 export const broadcastTxSync = async (
   keplr:Keplr,
   chainId: string,
