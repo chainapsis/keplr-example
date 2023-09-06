@@ -2,12 +2,11 @@ import React, {useEffect} from 'react';
 import {getKeplrFromWindow} from "./util/getKeplrFromWindow";
 import {OsmosisChainInfo} from "./constants";
 import {Balances} from "./types/balance";
-import {Dec, DecUtils} from "@keplr-wallet/unit";
-import {Keplr} from "@keplr-wallet/types";
-import {fetchAccountInfo, sendMsgs} from "./util/sendMsgs";
+import {Dec} from "@keplr-wallet/unit";
+import { sendMsgs} from "./util/sendMsgs";
 import {api} from "./util/api";
-import {MsgSend} from "@keplr-wallet/proto-types/cosmos/bank/v1beta1/tx";
 import {simulateMsgs} from "./util/simulateMsgs";
+import {MsgSend} from "./proto-types-gen/src/cosmos/bank/v1beta1/tx";
 
 function App() {
   const [address, setAddress] = React.useState<string>('');
