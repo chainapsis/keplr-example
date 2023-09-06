@@ -5,9 +5,7 @@ import {AuthInfo, Fee, SignerInfo, TxBody, TxRaw} from "../proto-types-gen/src/c
 import {SignMode} from "../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing";
 import {PubKey} from "../proto-types-gen/src/cosmos/crypto/secp256k1/keys";
 import {Any} from "../proto-types-gen/src/google/protobuf/any";
-
 import Long from "long";
-
 
 export const sendMsgs = async (
   keplr:Keplr,
@@ -19,47 +17,49 @@ export const sendMsgs = async (
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
 
+  const signDoc = {
+    bodyBytes: TxBody.encode(
+      TxBody.fromPartial({
+        messages: proto,
+        memo,
+      })
+    ).finish(),
+    authInfoBytes: AuthInfo.encode({
+      signerInfos: [
+        {
+          publicKey: {
+            typeUrl: "/cosmos.crypto.secp256k1.PubKey",
+            value: PubKey.encode({
+              key: Buffer.from(account.pub_key.key, "base64"),
+            }).finish(),
+          },
+          modeInfo: {
+            single: {
+              mode: SignMode.SIGN_MODE_DIRECT,
+            },
+            multi: undefined,
+          },
+          sequence: account.sequence,
+        },
+      ],
+      fee: Fee.fromPartial({
+        amount: fee.amount.map((coin) => {
+          return {
+            denom: coin.denom,
+            amount: coin.amount.toString(),
+          };
+        }),
+        gasLimit: fee.gas,
+      }),
+    }).finish(),
+    chainId: chainInfo.chainId,
+    accountNumber: Long.fromString(account.account_number)
+  }
+
   const signed = await keplr.signDirect(
     chainInfo.chainId,
     sender,
-    {
-      bodyBytes: TxBody.encode(
-        TxBody.fromPartial({
-          messages: proto,
-          memo,
-        })
-      ).finish(),
-      authInfoBytes: AuthInfo.encode({
-        signerInfos: [
-          {
-            publicKey: {
-              typeUrl: "/cosmos.crypto.secp256k1.PubKey",
-              value: PubKey.encode({
-                key: Buffer.from(account.pub_key.key, "base64"),
-              }).finish(),
-            },
-            modeInfo: {
-              single: {
-                mode: SignMode.SIGN_MODE_DIRECT,
-              },
-              multi: undefined,
-            },
-            sequence: account.sequence,
-          },
-        ],
-        fee: Fee.fromPartial({
-          amount: fee.amount.map((coin) => {
-            return {
-              denom: coin.denom,
-              amount: coin.amount.toString(),
-            };
-          }),
-          gasLimit: fee.gas,
-        }),
-      }).finish(),
-      chainId: chainInfo.chainId,
-      accountNumber: Long.fromString(account.account_number),
-    },
+    signDoc,
   )
 
   const signedTx = {

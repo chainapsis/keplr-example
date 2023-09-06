@@ -7,6 +7,7 @@ import {Keplr} from "@keplr-wallet/types";
 import {fetchAccountInfo, sendMsgs} from "./util/sendMsgs";
 import {api} from "./util/api";
 import {MsgSend} from "@keplr-wallet/proto-types/cosmos/bank/v1beta1/tx";
+import {simulateMsgs} from "./util/simulateMsgs";
 
 function App() {
   const [address, setAddress] = React.useState<string>('');
@@ -72,16 +73,31 @@ function App() {
         }).finish(),
       }
 
-      await sendMsgs(
-        window.keplr,
-        OsmosisChainInfo,
-        key.bech32Address,
-        [protoMsgs],
-        {
-          amount: [{denom: "uosmo",
-            amount: "236",}],
-          gas: "94250",
-        })
+      try {
+        const gasUsed = await simulateMsgs(
+          OsmosisChainInfo,
+          key.bech32Address,
+          [protoMsgs],
+          [{denom: "uosmo",
+            amount: "236",}]
+          );
+
+        await sendMsgs(
+          window.keplr,
+          OsmosisChainInfo,
+          key.bech32Address,
+          [protoMsgs],
+          {
+            amount: [{denom: "uosmo",
+              amount: "236",}],
+            gas: Math.floor(gasUsed * 1.5).toString(),
+          })
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e.message);
+        }
+      }
+
     }
   }
 

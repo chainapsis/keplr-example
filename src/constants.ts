@@ -6,7 +6,7 @@ export const OsmosisChainInfo = {
   // RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
   rpc: "https://rpc-osmosis.keplr.app",
   // REST endpoint of the chain.
-  rest: "https://lcd-osmosis.keplr.app",
+  rest: "https://lcd-osmosis.blockapsis.com",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
