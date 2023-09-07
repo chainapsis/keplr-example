@@ -1,6 +1,6 @@
 import {ChainInfo, Keplr, StdFee} from "@keplr-wallet/types";
 import {Any} from "../proto-types-gen/src/google/protobuf/any";
-import {AuthInfo, Fee, TxBody, TxRaw} from "../proto-types-gen/src/cosmos/tx/v1beta1/tx";
+import {AuthInfo, Fee, SignerInfo, TxBody, TxRaw} from "../proto-types-gen/src/cosmos/tx/v1beta1/tx";
 import {PubKey} from "../proto-types-gen/src/cosmos/crypto/secp256k1/keys";
 import {SignMode} from "../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing";
 import Long from "long";
@@ -19,7 +19,7 @@ export const simulateMsgs = async (
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
 
-  const signDoc = {
+  const unsignedTx =TxRaw.encode( {
     bodyBytes: TxBody.encode(
       TxBody.fromPartial({
         messages: proto,
@@ -28,13 +28,10 @@ export const simulateMsgs = async (
     ).finish(),
     authInfoBytes: AuthInfo.encode({
       signerInfos: [
-        {
-          publicKey: {
-            typeUrl: "/cosmos.crypto.secp256k1.PubKey",
-            value: PubKey.encode({
-              key: Buffer.from(account.pub_key.key, "base64"),
-            }).finish(),
-          },
+        SignerInfo.fromPartial({
+          // Pub key is ignored.
+          // It is fine to ignore the pub key when simulating tx.
+          // However, the estimated gas would be slightly smaller because tx size doesn't include pub key.
           modeInfo: {
             single: {
               mode: SignMode.SIGN_MODE_DIRECT,
@@ -42,7 +39,7 @@ export const simulateMsgs = async (
             multi: undefined,
           },
           sequence: account.sequence,
-        },
+        }),
       ],
       fee: Fee.fromPartial({
         amount: fee.map((coin) => {
@@ -53,14 +50,16 @@ export const simulateMsgs = async (
         }),
       }),
     }).finish(),
-    chainId: chainInfo.chainId,
-    accountNumber: Long.fromString(account.account_number)
-  }
-
-  const unsignedTx = TxRaw.encode({...signDoc, signatures: [new Uint8Array(64)]}).finish();
+    // Because of the validation of tx itself, the signature must exist.
+    // However, since they do not actually verify the signature, it is okay to use any value.
+    signatures: [new Uint8Array(64)],
+  }).finish()
 
   const simulatedResult = await api<GasSimulateResponse>(`${OsmosisChainInfo.rest}/cosmos/tx/v1beta1/simulate`, {
     method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
     body: JSON.stringify({
       tx_bytes: Buffer.from(unsignedTx).toString("base64")
     })
