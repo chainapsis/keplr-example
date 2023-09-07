@@ -7,6 +7,9 @@ import { sendMsgs} from "./util/sendMsgs";
 import {api} from "./util/api";
 import {simulateMsgs} from "./util/simulateMsgs";
 import {MsgSend} from "./proto-types-gen/src/cosmos/bank/v1beta1/tx";
+import "./styles/container.css";
+import "./styles/button.css";
+import "./styles/item.css";
 
 function App() {
   const [address, setAddress] = React.useState<string>('');
@@ -50,6 +53,8 @@ function App() {
       if(balance) {
         const amount = new Dec(balance.amount, osmoDecimal);
         setBalance(`${amount.toString(osmoDecimal)} OSMO`)
+      } else {
+        setBalance(`0 OSMO`)
       }
     }
   }
@@ -81,16 +86,18 @@ function App() {
             amount: "236",}]
           );
 
-        await sendMsgs(
-          window.keplr,
-          OsmosisChainInfo,
-          key.bech32Address,
-          [protoMsgs],
-          {
-            amount: [{denom: "uosmo",
-              amount: "236",}],
-            gas: Math.floor(gasUsed * 1.5).toString(),
-          })
+        if(gasUsed) {
+          await sendMsgs(
+            window.keplr,
+            OsmosisChainInfo,
+            key.bech32Address,
+            [protoMsgs],
+            {
+              amount: [{denom: "uosmo",
+                amount: "236",}],
+              gas: Math.floor(gasUsed * 1.5).toString(),
+            })
+        }
       } catch (e) {
         if (e instanceof Error) {
           console.log(e.message);
@@ -102,21 +109,57 @@ function App() {
 
 
   return (
-    <div className="App">
-      <div>
-        <button onClick={getKeyFromKeplr}>Get Address</button>
-        Address: {address}
-      </div>
+    <div className="root-container">
+        <div style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "16px"
+        }}>
+          <img src="/keplr-logo.png" style={{maxWidth: "200px"}} alt="keplr-logo" />
+        </div>
 
-      <div>
-        <button onClick={getBalance}>Get Balance</button>
-        Balance: {balance}
-      </div>
 
-      <div>
-        <button onClick={sendBalance}>Send</button>
-      </div>
 
+      <div className="item-container">
+        <div className="item">
+          <div className="item-title">
+            Get OSMO Address
+          </div>
+
+          <div className="item-content">
+            <div>
+              Address: {address}
+            </div>
+
+            <div>
+              <button className="keplr-button" onClick={getKeyFromKeplr}>Get Address</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">
+            Get OSMO Balance
+          </div>
+
+          <div className="item-content">
+            Balance: {balance}
+
+            <button className="keplr-button" onClick={getBalance}>Get Balance</button>
+          </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">
+            Send OSMO
+          </div>
+
+          <div className="item-content">
+            <button className="keplr-button" onClick={sendBalance}>Send</button>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

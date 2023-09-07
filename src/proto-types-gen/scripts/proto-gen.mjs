@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies, @typescript-eslint/no-var-requires */
 
 import "zx/globals";
-import fs from "fs";
 
 (async () => {
   try {
@@ -10,23 +9,10 @@ import fs from "fs";
     await $`mkdir -p ${outDir}`;
     $.verbose = true;
 
-    const protoTsBinPath = (() => {
-      try {
-        const binPath = path.join(
-          __dirname,
-          "../node_modules/.bin/protoc-gen-ts_proto"
-        );
-        fs.readFileSync(binPath);
-        return binPath;
-      } catch {
-        const binPath = path.join(
-          __dirname,
-          "../../../node_modules/.bin/protoc-gen-ts_proto"
-        );
-        fs.readFileSync(binPath);
-        return binPath;
-      }
-    })();
+    const protoTsBinPath = path.join(
+      __dirname,
+      "../../../node_modules/.bin/protoc-gen-ts_proto"
+    );
 
     const baseDirPath = path.join(__dirname, "..");
 
@@ -75,5 +61,3 @@ import fs from "fs";
     process.exit(1);
   }
 })();
-
-/* eslint-enable import/no-extraneous-dependencies, @typescript-eslint/no-var-requires */
