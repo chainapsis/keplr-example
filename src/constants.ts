@@ -1,12 +1,12 @@
 export const OsmosisChainInfo = {
   // Chain-id of the Osmosis chain.
-  chainId: "osmosis-1",
+  chainId: "osmo-test-5",
   // The name of the chain to be displayed to the user.
-  chainName: "Osmosis mainnet",
+  chainName: "Osmosis Testnet",
   // RPC endpoint of the chain. In this case we are using blockapsis, as it's accepts connections from any host currently. No Cors limitations.
-  rpc: "https://rpc-osmosis.blockapsis.com",
+  rpc: "https://rpc.osmotest5.osmosis.zone",
   // REST endpoint of the chain.
-  rest: "https://lcd-osmosis.blockapsis.com",
+  rest: "https://lcd.osmotest5.osmosis.zone",
   // Staking coin information
   stakeCurrency: {
     // Coin denomination to be displayed to the user.
@@ -83,10 +83,4 @@ export const OsmosisChainInfo = {
       },
     },
   ],
-  // (Optional) The number of the coin type.
-  // This field is only used to fetch the address from ENS.
-  // Ideally, it is recommended to be the same with BIP44 path's coin type.
-  // However, some early chains may choose to use the Cosmos Hub BIP44 path of '118'.
-  // So, this is separated to support such chains.
-  coinType: 118,
 }

@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {getKeplrFromWindow} from "./util/getKeplrFromWindow";
 import {OsmosisChainInfo} from "./constants";
 import {Balances} from "./types/balance";
-import {Dec} from "@keplr-wallet/unit";
-import { sendMsgs} from "./util/sendMsgs";
+import {Dec, DecUtils} from "@keplr-wallet/unit";
+import {sendMsgs} from "./util/sendMsgs";
 import {api} from "./util/api";
 import {simulateMsgs} from "./util/simulateMsgs";
 import {MsgSend} from "./proto-types-gen/src/cosmos/bank/v1beta1/tx";
@@ -14,6 +14,9 @@ import "./styles/item.css";
 function App() {
   const [address, setAddress] = React.useState<string>('');
   const [balance, setBalance] = React.useState<string>('');
+
+  const [recipient, setRecipient] = React.useState<string>('');
+  const [amount, setAmount] = React.useState<string>('');
 
   useEffect(() => {
     init();
@@ -62,16 +65,15 @@ function App() {
   const sendBalance = async () => {
     if (window.keplr) {
       const key = await window.keplr.getKey(OsmosisChainInfo.chainId);
-
       const protoMsgs = {
         typeUrl: "/cosmos.bank.v1beta1.MsgSend",
         value: MsgSend.encode({
           fromAddress: key.bech32Address,
-          toAddress: key.bech32Address,
+          toAddress: recipient,
           amount: [
             {
               denom: "uosmo",
-              amount: "10000",
+              amount: DecUtils.getTenExponentN(6).mul(new Dec(amount)).truncate().toString(),
             },
           ],
         }).finish(),
@@ -155,6 +157,22 @@ function App() {
           </div>
 
           <div className="item-content">
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Recipient:
+              <input type="text" value={recipient} onChange={(e) => setRecipient(e.target.value)} />
+            </div>
+
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Amount:
+              <input type="text" value={amount} onChange={(e) => setAmount(e.target.value)} />
+            </div>
+
             <button className="keplr-button" onClick={sendBalance}>Send</button>
           </div>
 

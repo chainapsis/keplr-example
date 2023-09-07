@@ -6,6 +6,7 @@ import {SignMode} from "../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing
 import {PubKey} from "../proto-types-gen/src/cosmos/crypto/secp256k1/keys";
 import {Any} from "../proto-types-gen/src/google/protobuf/any";
 import Long from "long";
+import {Buffer} from "buffer";
 
 export const sendMsgs = async (
   keplr:Keplr,
@@ -16,6 +17,7 @@ export const sendMsgs = async (
   memo: string = ""
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
+  const { pubKey } = await keplr.getKey(chainInfo.chainId);
 
   if(account) {
     const signDoc = {
@@ -31,7 +33,7 @@ export const sendMsgs = async (
             publicKey: {
               typeUrl: "/cosmos.crypto.secp256k1.PubKey",
               value: PubKey.encode({
-                key: Buffer.from(account.pub_key.key, "base64"),
+                key: pubKey,
               }).finish(),
             },
             modeInfo: {
@@ -72,7 +74,9 @@ export const sendMsgs = async (
       signDoc: signed.signed,
     }
 
-    await broadcastTxSync(keplr, chainInfo.chainId, signedTx.tx);
+    const txHash = await broadcastTxSync(keplr, chainInfo.chainId, signedTx.tx);
+    console.log("txHash", Buffer.from(txHash).toString())
+
   }
 }
 

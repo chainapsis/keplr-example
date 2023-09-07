@@ -21,3 +21,11 @@
     gap: 12px;
     padding: 16px;
 }
+
+input {
+    margin: 0;
+    border: 1px solid #09090A;
+    border-radius: 0.5rem;
+
+    padding: 0.75rem 0.75rem;
+}
