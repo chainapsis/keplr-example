@@ -7,6 +7,7 @@ import {PubKey} from "../proto-types-gen/src/cosmos/crypto/secp256k1/keys";
 import {Any} from "../proto-types-gen/src/google/protobuf/any";
 import Long from "long";
 import {Buffer} from "buffer";
+import {TendermintTxTracer} from "@keplr-wallet/cosmos";
 
 export const sendMsgs = async (
   keplr:Keplr,
@@ -75,7 +76,10 @@ export const sendMsgs = async (
     }
 
     const txHash = await broadcastTxSync(keplr, chainInfo.chainId, signedTx.tx);
-    console.log("txHash", Buffer.from(txHash).toString())
+    const txTracer = new TendermintTxTracer(chainInfo.rpc, "/websocket");
+    txTracer.traceTx(txHash).then((tx) => {
+      alert("Transaction commit successfully");
+    });
 
   }
 }
