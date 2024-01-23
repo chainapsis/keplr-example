@@ -12,7 +12,7 @@ import { getKeplrFromWindow } from "../../util/getKeplrFromWindow";
 type HomeProps = {};
 
 const Home: React.FC<HomeProps> = () => {
-  const [recipient, setRecipient] = React.useState<string>("");
+  /* const [recipient, setRecipient] = React.useState<string>("");
   const [amount, setAmount] = React.useState<string>("");
   useEffect(() => {
     init();
@@ -78,10 +78,10 @@ const Home: React.FC<HomeProps> = () => {
         }
       }
     }
-  };
+  }; */
   return (
     <section>
-      <div className="container">
+      {/*   <div className="container">
         <div className="p-4">
           <div className="text-center font-bold uppercase">Send OSMO</div>
 
@@ -115,7 +115,7 @@ const Home: React.FC<HomeProps> = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <AllData />
     </section>
   );

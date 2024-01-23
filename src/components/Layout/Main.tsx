@@ -6,7 +6,7 @@ type MainProps = {};
 
 const Main: React.FC<MainProps> = () => {
   return (
-    <main className="container mx-auto">
+    <main className="">
       <Nav />
       <Outlet />
     </main>

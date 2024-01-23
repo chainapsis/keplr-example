@@ -7,6 +7,7 @@ import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { MsgSend } from "../../proto-types-gen/src/cosmos/bank/v1beta1/tx";
 import { api } from "../../util/api";
 import { getKeplrFromWindow } from "../../util/getKeplrFromWindow";
+import { Link } from "react-router-dom";
 
 type NavProps = {};
 
@@ -64,23 +65,25 @@ const Nav: React.FC<NavProps> = () => {
   };
 
   return (
-    <div>
+    <div className="shadow-xl ">
       {/* header start */}
-      <div className="container w-full relative">
+      <div className="container mx-auto relative">
         <div className="flex justify-between items-center gap-5 p-4 ">
-          <div className="">
-            <img
-              className="max-w-[200px] mr-auto "
-              src="/keplr-logo.png"
-              alt="keplr-logo"
-            />
-          </div>
+          <Link to="/">
+            <div className="">
+              <img
+                className="max-w-[200px] mr-auto "
+                src="/keplr-logo.png"
+                alt="keplr-logo"
+              />
+            </div>
+          </Link>
           <div className="">
             <button
               onClick={() => setOpen(!open)}
-              className="btn bg-gradient-to-r from-[#65b9f4] to-[#a172f2] px-4 py-2 rounded text-white"
+              className="btn bg-gradient-to-r from-[#65b9f4] to-[#a172f2] px-4 py-2 rounded text-white uppercase"
             >
-              {open ? "x" : "wallet"}
+              {open ? "x" : "get balance"}
             </button>
           </div>
         </div>

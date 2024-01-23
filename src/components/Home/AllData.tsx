@@ -1,42 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { IData } from "../../types/ItemType";
+import { fakeData } from "../../util/fakeData";
 
 type AllDataProps = {};
 
-type IData = {
-  id: string;
-  name: string;
-  description: string;
-  amount: number;
-  price: number;
-};
-
 const AllData: React.FC<AllDataProps> = () => {
-  const fakeData: IData[] = [
-    {
-      id: "1",
-      name: "Widget A",
-      description: "A high-quality widget with advanced features.",
-      amount: 15,
-      price: 29.99,
-    },
-    {
-      id: "2",
-      name: "Gizmo B",
-      description: "An innovative gizmo for everyday use.",
-      amount: 8,
-      price: 49.99,
-    },
-    {
-      id: "3",
-      name: "Doohickey C",
-      description: "The latest doohickey with cutting-edge technology.",
-      amount: 20,
-      price: 39.99,
-    },
-  ];
   return (
-    <div className="container">
+    <div className="container mx-auto mt-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 ">
         {fakeData.map((item: IData) => (
           <div key={item.id}>
@@ -51,7 +22,7 @@ const AllData: React.FC<AllDataProps> = () => {
                   <p>Price {item.price}</p>
                   <div className="card-actions justify-start">
                     <button className="btn btn bg-gradient-to-r from-[#65b9f4] to-[#a172f2] px-4 py-2 rounded text-white">
-                      <Link to={`/details/${item.id}`}>explore more</Link>
+                      <Link to={`/details/${item.id}`}>details more</Link>
                     </button>
                   </div>
                 </div>
