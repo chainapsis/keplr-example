@@ -4,4 +4,7 @@ export type IData = {
   description: string;
   amount: number;
   price: number;
+  quantity: number;
+  totalQuantity: number;
+  image: string;
 };

@@ -8,6 +8,7 @@ import { sendMsgs } from "../../util/sendMsgs";
 import { IData } from "../../types/ItemType";
 import { useParams } from "react-router-dom";
 import { fakeData } from "../../util/fakeData";
+import ProductQuantityProgressBar from "../Home/ProductQuantityProgressBar";
 
 type DetailsProps = {};
 
@@ -89,9 +90,9 @@ const Details: React.FC<DetailsProps> = () => {
               <div className="flex flex-wrap items-center" key={item.id}>
                 <div className="lg:w-1/2 w-full mb-10 lg:mb-0 rounded-lg overflow-hidden">
                   <img
-                    alt="feature"
-                    className="object-cover object-center  w-full"
-                    src="https://dummyimage.com/460x200"
+                    src={item.image}
+                    className="rounded-md shadow-xl object-cover object-center  w-full"
+                    alt=""
                   />
                 </div>
                 <div className="flex flex-col flex-wrap lg:py-6 -mb-10 lg:w-1/2 lg:pl-12 lg:text-left text-center">
@@ -115,6 +116,10 @@ const Details: React.FC<DetailsProps> = () => {
                         <p>{item.description}</p>
                       </div>
                       <p>Price {item.price}</p>
+                      <ProductQuantityProgressBar
+                        currentQuantity={item.quantity}
+                        maxQuantityPerBlock={item.totalQuantity}
+                      />
                       <button
                         onClick={() => sendBalance(item.price.toString())}
                         className="mt-3 btn btn bg-gradient-to-r from-[#65b9f4] to-[#a172f2] px-4 py-2 rounded text-white w-28 flex items-center gap-5 uppercase"
