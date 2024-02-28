@@ -17,6 +17,8 @@ function App() {
 
   const [recipient, setRecipient] = React.useState<string>('');
   const [amount, setAmount] = React.useState<string>('');
+  const [message, setMessage] = React.useState<string>('');
+  const [signature, setSignature] = React.useState<string>('');
 
   useEffect(() => {
     init();
@@ -109,6 +111,21 @@ function App() {
     }
   }
 
+  const signMessage = async () => {
+    if (window.keplr) {
+      const key = await window.keplr.getKey(OsmosisChainInfo.chainId);
+      
+      try {
+        const signature = await window.keplr.signArbitrary(OsmosisChainInfo.chainId, key.bech32Address, message)
+        setSignature(signature.signature)
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e.message);
+        }
+      }
+    }
+  }
+
 
   return (
     <div className="root-container">
@@ -174,6 +191,33 @@ function App() {
             </div>
 
             <button className="keplr-button" onClick={sendBalance}>Send</button>
+          </div>
+
+        </div>
+
+        <div className="item">
+          <div className="item-title">
+            Sign Message
+          </div>
+
+          <div className="item-content">
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Message:
+              <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
+            </div>
+
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Signature:
+              <input type="text" readOnly value={signature} />
+            </div>
+
+            <button className="keplr-button" onClick={signMessage}>Sign</button>
           </div>
 
         </div>
