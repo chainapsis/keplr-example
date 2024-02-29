@@ -3,9 +3,11 @@ import {getKeplrFromWindow} from "./util/getKeplrFromWindow";
 import {OsmosisChainInfo} from "./constants";
 import {Balances} from "./types/balance";
 import {Dec, DecUtils} from "@keplr-wallet/unit";
+import {encodeSecp256k1Signature} from "@keplr-wallet/cosmos"
 import {sendMsgs} from "./util/sendMsgs";
 import {api} from "./util/api";
 import {simulateMsgs} from "./util/simulateMsgs";
+import { StdSignature } from "@keplr-wallet/types";
 import {MsgSend} from "./proto-types-gen/src/cosmos/bank/v1beta1/tx";
 import "./styles/container.css";
 import "./styles/button.css";
@@ -17,6 +19,12 @@ function App() {
 
   const [recipient, setRecipient] = React.useState<string>('');
   const [amount, setAmount] = React.useState<string>('');
+  const [message, setMessage] = React.useState<string>('');
+  const [stdSignature, setStdSignature] = React.useState<StdSignature | undefined>(undefined);
+
+  const [verifyMessage, setVerifyMessage] = React.useState<string>('');
+  const [verifyStdSignature, setVerifyStdSignature] = React.useState<StdSignature | undefined>(undefined);
+  const [verificationResult, setVerificationResult] = React.useState<boolean>(false);
 
   useEffect(() => {
     init();
@@ -109,6 +117,43 @@ function App() {
     }
   }
 
+  const signMessage = async () => {
+    if (window.keplr) {
+      const key = await window.keplr.getKey(OsmosisChainInfo.chainId);
+      
+      try {
+        const signature = await window.keplr.signArbitrary(OsmosisChainInfo.chainId, key.bech32Address, message);
+        setStdSignature(signature);
+        setVerifyMessage(message);
+        setVerifyStdSignature(signature);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e.message);
+        }
+      }
+    }
+  }
+
+  const verifySignature = async () => {
+    if (window.keplr) {
+      const key = await window.keplr.getKey(OsmosisChainInfo.chainId);
+      
+      try {
+        if (!verifyStdSignature) {
+          return;
+        }
+
+        const result = await window.keplr.verifyArbitrary(OsmosisChainInfo.chainId, key.bech32Address, verifyMessage, verifyStdSignature);
+        setVerificationResult(result);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e.message);
+          setVerificationResult(false);
+        }
+      }
+    }
+  }
+
 
   return (
     <div className="root-container">
@@ -174,6 +219,68 @@ function App() {
             </div>
 
             <button className="keplr-button" onClick={sendBalance}>Send</button>
+          </div>
+
+        </div>
+
+        <div className="item">
+          <div className="item-title">
+            Sign Message
+          </div>
+
+          <div className="item-content">
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Message:
+              <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} />
+            </div>
+
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Signature:
+              <input type="text" readOnly value={stdSignature?.signature} />
+            </div>
+
+            <button className="keplr-button" onClick={signMessage}>Sign</button>
+          </div>
+
+        </div>
+
+        <div className="item">
+          <div className="item-title">
+            Verify Signature
+          </div>
+
+          <div className="item-content">
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Data:
+              <input type="text" value={verifyMessage} onChange={(e) => setVerifyMessage(e.target.value)} />
+            </div>
+
+            <div style={{
+              display: "flex",
+              flexDirection: "column"
+            }}>
+              Signature:
+              <input type="text" value={verifyStdSignature?.signature} onChange={(e) => {
+                if (verifyStdSignature?.pub_key) {
+                  setVerifyStdSignature({ pub_key: verifyStdSignature.pub_key, signature: e.target.value })
+                }
+              }} />
+            </div>
+
+            <div>
+              Result: {verificationResult ? 'VALID' : 'FAILED'}
+            </div>
+
+            <button className="keplr-button" onClick={verifySignature}>Verify</button>
           </div>
 
         </div>
