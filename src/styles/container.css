@@ -1,18 +1,19 @@
 .root-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    padding: 20px;
+  padding: 20px;
+  margin-bottom: 80px;
 }
 
 .item-container {
-    margin-top: 40px;
-    min-width: 70vw;
+  margin-top: 20px;
+  min-width: 70vw;
 
-    gap: 20px;
+  gap: 20px;
 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
