@@ -40,8 +40,8 @@ function App() {
     if (keplr) {
       try {
         await keplr.experimentalSuggestChain(OsmosisChainInfo);
-        if (!keplr.ethereum.isConnected()) {
-          await keplr.ethereum.enable();
+        if (!keplr.ethereum?.isConnected()) {
+          await keplr.ethereum?.enable();
         }
       } catch (e) {
         if (e instanceof Error) {
@@ -238,7 +238,7 @@ function App() {
                 <button
                   className="keplr-button"
                   onClick={async () => {
-                    const result = await window.keplr?.ethereum.request({
+                    const result = await window.keplr?.ethereum?.request({
                       method,
                     });
                     setEvmResult1(result.toString());
@@ -263,14 +263,14 @@ function App() {
               },
               {
                 method: "eth_getBalance",
-                params: [window.keplr?.ethereum.selectedAddress, "latest"],
+                params: [window.keplr?.ethereum?.selectedAddress, "latest"],
               },
             ].map(({ method, params }) => (
               <div key={method}>
                 <button
                   className="keplr-button"
                   onClick={async () => {
-                    const result = await window.keplr?.ethereum.request({
+                    const result = await window.keplr?.ethereum?.request({
                       method,
                       params,
                     });
@@ -295,13 +295,13 @@ function App() {
                 method: "personal_sign",
                 params: [
                   "This is an example message",
-                  window.keplr?.ethereum.selectedAddress,
+                  window.keplr?.ethereum?.selectedAddress,
                 ],
               },
               {
                 method: "eth_signTypedData_v3",
                 params: [
-                  window.keplr?.ethereum.selectedAddress,
+                  window.keplr?.ethereum?.selectedAddress,
                   {
                     types: {
                       EIP712Domain: [
@@ -372,7 +372,7 @@ function App() {
               {
                 method: "eth_signTypedData_v4",
                 params: [
-                  window.keplr?.ethereum.selectedAddress,
+                  window.keplr?.ethereum?.selectedAddress,
                   {
                     domain: {
                       chainId: 1,
@@ -429,7 +429,7 @@ function App() {
                 <button
                   className="keplr-button"
                   onClick={async () => {
-                    const result = await window.keplr?.ethereum.request({
+                    const result = await window.keplr?.ethereum?.request({
                       method,
                       params,
                     });
@@ -485,7 +485,7 @@ function App() {
                   return;
                 }
 
-                const currentChainId = window.keplr?.ethereum._currentChainId;
+                const currentChainId = window.keplr?.ethereum?._currentChainId;
 
                 const currentChainInfo =
                   await window.keplr?.getChainInfoWithoutEndpoints(
@@ -509,17 +509,17 @@ function App() {
                 ).toString(16)}`;
 
                 const tx = {
-                  from: window.keplr?.ethereum.selectedAddress,
+                  from: window.keplr?.ethereum?.selectedAddress,
                   to: evmRecipient,
                   value: amountValue,
                 };
 
-                const gasUsed = await window.keplr?.ethereum.request({
+                const gasUsed = await window.keplr?.ethereum?.request({
                   method: "eth_estimateGas",
                   params: [tx],
                 });
 
-                const result = await window.keplr?.ethereum.request({
+                const result = await window.keplr?.ethereum?.request({
                   method: "eth_sendTransaction",
                   params: [{ ...tx, gas: gasUsed }],
                 });
@@ -552,7 +552,7 @@ function App() {
             <button
               className="keplr-button"
               onClick={async () => {
-                await window.keplr?.ethereum.request({
+                await window.keplr?.ethereum?.request({
                   method: "wallet_switchEthereumChain",
                   params: [
                     {
@@ -586,7 +586,7 @@ function App() {
             <button
               className="keplr-button"
               onClick={async () => {
-                await window.keplr?.ethereum.request({
+                await window.keplr?.ethereum?.request({
                   method: "wallet_watchAsset",
                   params: {
                     type: "ERC20",
