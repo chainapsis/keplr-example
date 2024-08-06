@@ -31,7 +31,18 @@ function App() {
 
   const [evmTokenAddress, setEvmTokenAddress] = React.useState<string>("");
 
+  const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
+    React.useState<any>();
+
   useEffect(() => {
+    window.addEventListener("eip6963:announceProvider", (e) => {
+      const event = e as CustomEvent;
+      if (event.detail.info.rdns === "app.keplr") {
+        setKeplrEip6963ProviderInfo(event.detail.info);
+      }
+    });
+
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
     init();
   }, []);
 
@@ -222,6 +233,27 @@ function App() {
         className="item-container"
         style={{ maxWidth: 576, overflowWrap: "anywhere" }}
       >
+        {keplrEip6963ProviderInfo && (
+          <div className="item">
+            <div className="item-title">EIP-6963 Provider Info</div>
+
+            <div className="item-content">
+              <div>UUID: {keplrEip6963ProviderInfo.uuid}</div>
+              <div>Name: {keplrEip6963ProviderInfo.name}</div>
+              <div>RDNS: {keplrEip6963ProviderInfo.rdns}</div>
+              <div>
+                Icon:{" "}
+                <img
+                  src={keplrEip6963ProviderInfo.icon}
+                  alt={keplrEip6963ProviderInfo.name}
+                  width={32}
+                  height={32}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="item">
           <div className="item-title">Get Data From Wallet</div>
 
@@ -514,14 +546,9 @@ function App() {
                   value: amountValue,
                 };
 
-                const gasUsed = await window.keplr?.ethereum?.request({
-                  method: "eth_estimateGas",
-                  params: [tx],
-                });
-
                 const result = await window.keplr?.ethereum?.request({
                   method: "eth_sendTransaction",
-                  params: [{ ...tx, gas: gasUsed }],
+                  params: [tx],
                 });
                 setEvmResult4(result);
               }}
@@ -530,6 +557,46 @@ function App() {
             </button>
 
             <div>Transaction Hash: {evmResult4}</div>
+          </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">Add an EVM Chain</div>
+
+          <div className="item-content">
+            <div>Chain ID: 0x64</div>
+            <div>ChainName: Gnosis</div>
+            <div>RPC URL: https://rpc.gnosischain.com</div>
+            <button
+              className="keplr-button"
+              onClick={async () => {
+                await window.keplr?.ethereum?.request({
+                  method: "wallet_addEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x64",
+                      chainName: "Gnosis",
+                      rpcUrls: [
+                        "https://rpc.gnosischain.com",
+                        "wss://rpc.gnosischain.com",
+                      ],
+                      iconUrls: [
+                        "https://xdaichain.com/fake/example/url/xdai.svg",
+                        "https://xdaichain.com/fake/example/url/xdai.png",
+                      ],
+                      nativeCurrency: {
+                        name: "XDAI",
+                        symbol: "XDAI",
+                        decimals: 18,
+                      },
+                      blockExplorerUrls: ["https://blockscout.com/poa/xdai/"],
+                    },
+                  ],
+                });
+              }}
+            >
+              {"wallet_addEthereumChain"}
+            </button>
           </div>
         </div>
         <div className="item">

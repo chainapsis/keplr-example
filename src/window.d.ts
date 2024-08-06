@@ -13,5 +13,6 @@ declare global {
         chainId: string
       ) => Promise<ChainInfoWithoutEndpoints>;
     };
+    ethereum?: any;
   }
 }
