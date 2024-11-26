@@ -1,5 +1,5 @@
 # Keplr Example
-This is a simple example if how to use Keplr extension. 
+This is a simple example of how to use Keplr extension. 
 
 ## Requirements
  - Node.js v18+
