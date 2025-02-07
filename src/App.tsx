@@ -295,13 +295,24 @@ function App() {
               },
               {
                 method: "eth_getBalance",
-                params: [window.keplr?.ethereum?.selectedAddress, "latest"],
               },
-            ].map(({ method, params }) => (
+            ].map(({ method }) => (
               <div key={method}>
                 <button
                   className="keplr-button"
                   onClick={async () => {
+                    const params = (() => {
+                      switch (method) {
+                        case "eth_getBalance":
+                          return [
+                            window.keplr?.ethereum?.selectedAddress,
+                            "latest",
+                          ];
+                        default:
+                          return;
+                      }
+                    })();
+
                     const result = await window.keplr?.ethereum?.request({
                       method,
                       params,
@@ -325,142 +336,157 @@ function App() {
             {[
               {
                 method: "personal_sign",
-                params: [
-                  "This is an example message",
-                  window.keplr?.ethereum?.selectedAddress,
-                ],
               },
               {
                 method: "eth_signTypedData_v3",
-                params: [
-                  window.keplr?.ethereum?.selectedAddress,
-                  {
-                    types: {
-                      EIP712Domain: [
-                        {
-                          name: "name",
-                          type: "string",
-                        },
-                        {
-                          name: "version",
-                          type: "string",
-                        },
-                        {
-                          name: "chainId",
-                          type: "uint256",
-                        },
-                        {
-                          name: "verifyingContract",
-                          type: "address",
-                        },
-                      ],
-                      Person: [
-                        {
-                          name: "name",
-                          type: "string",
-                        },
-                        {
-                          name: "wallet",
-                          type: "address",
-                        },
-                      ],
-                      Mail: [
-                        {
-                          name: "from",
-                          type: "Person",
-                        },
-                        {
-                          name: "to",
-                          type: "Person",
-                        },
-                        {
-                          name: "contents",
-                          type: "string",
-                        },
-                      ],
-                    },
-                    primaryType: "Mail",
-                    domain: {
-                      name: "Ether Mail",
-                      version: 1,
-                      chainId: 1,
-                      verifyingContract:
-                        "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
-                    },
-                    message: {
-                      from: {
-                        name: "Cow",
-                        wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                      },
-                      to: {
-                        name: "Bob",
-                        wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-                      },
-                      contents: "Hello, Bob!",
-                    },
-                  },
-                ],
               },
               {
                 method: "eth_signTypedData_v4",
-                params: [
-                  window.keplr?.ethereum?.selectedAddress,
-                  {
-                    domain: {
-                      chainId: 1,
-                      name: "Ether Mail",
-                      verifyingContract:
-                        "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
-                      version: "1",
-                    },
-                    message: {
-                      contents: "Hello, Bob!",
-                      attachedMoneyInEth: 4.2,
-                      from: {
-                        name: "Cow",
-                        wallets: [
-                          "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-                          "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
-                        ],
-                      },
-                      to: [
-                        {
-                          name: "Bob",
-                          wallets: [
-                            "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-                            "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-                            "0xB0B0b0b0b0b0B000000000000000000000000000",
-                          ],
-                        },
-                      ],
-                    },
-                    // This refers to the keys of the following types object.
-                    primaryType: "Mail",
-                    types: {
-                      EIP712Domain: [
-                        { name: "name", type: "string" },
-                        { name: "version", type: "string" },
-                        { name: "chainId", type: "uint256" },
-                        { name: "verifyingContract", type: "address" },
-                      ],
-                      Mail: [
-                        { name: "from", type: "Person" },
-                        { name: "to", type: "Person[]" },
-                        { name: "contents", type: "string" },
-                      ],
-                      Person: [
-                        { name: "name", type: "string" },
-                        { name: "wallets", type: "address[]" },
-                      ],
-                    },
-                  },
-                ],
               },
-            ].map(({ method, params }) => (
+            ].map(({ method }) => (
               <div key={method}>
                 <button
                   className="keplr-button"
                   onClick={async () => {
+                    const params = (() => {
+                      switch (method) {
+                        case "personal_sign":
+                          return [
+                            "0x536d9d5261206b3fd7ca989fe1c0afa69de8a1c673a14fcd5c98e1a641fad979",
+                            window.keplr?.ethereum?.selectedAddress,
+                          ];
+                        case "eth_signTypedData_v3":
+                          return [
+                            window.keplr?.ethereum?.selectedAddress,
+                            {
+                              types: {
+                                EIP712Domain: [
+                                  {
+                                    name: "name",
+                                    type: "string",
+                                  },
+                                  {
+                                    name: "version",
+                                    type: "string",
+                                  },
+                                  {
+                                    name: "chainId",
+                                    type: "uint256",
+                                  },
+                                  {
+                                    name: "verifyingContract",
+                                    type: "address",
+                                  },
+                                ],
+                                Person: [
+                                  {
+                                    name: "name",
+                                    type: "string",
+                                  },
+                                  {
+                                    name: "wallet",
+                                    type: "address",
+                                  },
+                                ],
+                                Mail: [
+                                  {
+                                    name: "from",
+                                    type: "Person",
+                                  },
+                                  {
+                                    name: "to",
+                                    type: "Person",
+                                  },
+                                  {
+                                    name: "contents",
+                                    type: "string",
+                                  },
+                                ],
+                              },
+                              primaryType: "Mail",
+                              domain: {
+                                name: "Ether Mail",
+                                version: 1,
+                                chainId: 1,
+                                verifyingContract:
+                                  "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+                              },
+                              message: {
+                                from: {
+                                  name: "Cow",
+                                  wallet:
+                                    "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+                                },
+                                to: {
+                                  name: "Bob",
+                                  wallet:
+                                    "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+                                },
+                                contents: "Hello, Bob!",
+                              },
+                            },
+                          ];
+                        case "eth_signTypedData_v4":
+                          return [
+                            window.keplr?.ethereum?.selectedAddress,
+                            {
+                              domain: {
+                                chainId: 1,
+                                name: "Ether Mail",
+                                verifyingContract:
+                                  "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+                                version: "1",
+                              },
+                              message: {
+                                contents: "Hello, Bob!",
+                                attachedMoneyInEth: 4.2,
+                                from: {
+                                  name: "Cow",
+                                  wallets: [
+                                    "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+                                    "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
+                                  ],
+                                },
+                                to: [
+                                  {
+                                    name: "Bob",
+                                    wallets: [
+                                      "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+                                      "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
+                                      "0xB0B0b0b0b0b0B000000000000000000000000000",
+                                    ],
+                                  },
+                                ],
+                              },
+                              // This refers to the keys of the following types object.
+                              primaryType: "Mail",
+                              types: {
+                                EIP712Domain: [
+                                  { name: "name", type: "string" },
+                                  { name: "version", type: "string" },
+                                  { name: "chainId", type: "uint256" },
+                                  {
+                                    name: "verifyingContract",
+                                    type: "address",
+                                  },
+                                ],
+                                Mail: [
+                                  { name: "from", type: "Person" },
+                                  { name: "to", type: "Person[]" },
+                                  { name: "contents", type: "string" },
+                                ],
+                                Person: [
+                                  { name: "name", type: "string" },
+                                  { name: "wallets", type: "address[]" },
+                                ],
+                              },
+                            },
+                          ];
+                        default:
+                          return [];
+                      }
+                    })();
+
                     const result = await window.keplr?.ethereum?.request({
                       method,
                       params,
