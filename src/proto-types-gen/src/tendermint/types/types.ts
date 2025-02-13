@@ -8,7 +8,7 @@ import { ValidatorSet } from "./validator";
 
 export const protobufPackage = "tendermint.types";
 
-/** BlockIdFlag indicates which BlcokID the signature is for */
+/** BlockIdFlag indicates which BlockID the signature is for */
 export enum BlockIDFlag {
   BLOCK_ID_FLAG_UNKNOWN = 0,
   BLOCK_ID_FLAG_ABSENT = 1,
