@@ -7,6 +7,7 @@ import { BitcoinTab } from "./components/BitcoinTab";
 import "./styles/container.css";
 import "./styles/button.css";
 import "./styles/item.css";
+import "./styles/tabs.css";
 
 type TabType = "osmosis" | "evm" | "starknet" | "bitcoin";
 
@@ -29,14 +30,7 @@ function App() {
         />
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "10px",
-          margin: "16px 0",
-        }}
-      >
+      <div className="tabs-navigation">
         {[
           { id: "osmosis", label: "Osmosis" },
           { id: "evm", label: "EVM" },
@@ -45,17 +39,17 @@ function App() {
         ].map((tab) => (
           <button
             key={tab.id}
-            className="keplr-button"
+            className="keplr-button tab-button"
             onClick={() => setActiveTab(tab.id as TabType)}
             style={{
               backgroundColor: activeTab === tab.id ? undefined : "#3C3C3C",
-              minWidth: "120px",
             }}
           >
             {tab.label}
           </button>
         ))}
       </div>
+
       {activeTab === "osmosis" && <OsmosisTab />}
       {activeTab === "evm" && <EvmTab />}
       {activeTab === "starknet" && <StarknetTab />}
