@@ -18,9 +18,6 @@ export const OsmosisTab: React.FC = () => {
     if (keplr) {
       try {
         await keplr.experimentalSuggestChain(OsmosisChainInfo);
-        if (!keplr.ethereum?.isConnected()) {
-          await keplr.ethereum?.enable();
-        }
       } catch (e) {
         if (e instanceof Error) {
           console.log(e.message);

@@ -15,6 +15,21 @@ export const EvmTab: React.FC = () => {
     useState<any>();
 
   useEffect(() => {
+    const init = async () => {
+      const keplr = window.keplr;
+      if (keplr) {
+        if (!keplr.ethereum?.isConnected()) {
+          try {
+            await keplr.ethereum?.enable();
+          } catch (e) {
+            if (e instanceof Error) {
+              console.log(e.message);
+            }
+          }
+        }
+      }
+    };
+
     const handleAnnounceProvider = (e: Event) => {
       const event = e as CustomEvent;
       if (event.detail.info.rdns === "app.keplr") {
@@ -22,6 +37,7 @@ export const EvmTab: React.FC = () => {
       }
     };
 
+    init();
     window.addEventListener("eip6963:announceProvider", handleAnnounceProvider);
     window.dispatchEvent(new Event("eip6963:requestProvider"));
 

@@ -1,5 +1,5 @@
 import { BitcoinSignMessageType, Network } from "@keplr-wallet/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export const BitcoinTab: React.FC = () => {
   const [address, setAddress] = useState<string>("");
@@ -21,7 +21,6 @@ export const BitcoinTab: React.FC = () => {
   );
   const [signature, setSignature] = useState<string>("");
 
-  // PSBT signing state
   const [psbtInputs, setPsbtInputs] = useState<string[]>([""]);
   const [signPsbtResult, setSignPsbtResult] = useState<string>("");
 
@@ -181,6 +180,19 @@ export const BitcoinTab: React.FC = () => {
       );
     }
   };
+
+  useEffect(() => {
+    const init = async () => {
+      const keplr = window.keplr;
+      if (keplr) {
+        const accounts = await keplr.bitcoin.getAccounts();
+        if (accounts.length === 0) {
+          await keplr.bitcoin.connectWallet();
+        }
+      }
+    };
+    init();
+  }, []);
 
   return (
     <>
