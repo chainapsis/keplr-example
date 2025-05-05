@@ -4,6 +4,9 @@
 
   border: 1px solid #ccc;
   border-radius: 5px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .item-title {
@@ -19,12 +22,38 @@
 
   gap: 12px;
   padding: 16px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 input {
   margin: 0;
   border: 1px solid #09090a;
   border-radius: 0.5rem;
-
   padding: 0.75rem 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  margin: 0;
+  border: 1px solid #09090a;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+select {
+  margin: 0;
+  border: 1px solid #09090a;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }

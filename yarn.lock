@@ -2427,12 +2427,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@keplr-wallet/types@npm:0.12.96, @keplr-wallet/types@npm:^0.12.96":
+"@keplr-wallet/types@npm:0.12.96":
   version: 0.12.96
   resolution: "@keplr-wallet/types@npm:0.12.96"
   dependencies:
     long: ^4.0.0
   checksum: ce7694cb672d7687d356522b919353e1c425e70f9ce9ff347f20d2c03b7c4da1c071d9c0da8d1176034dd08af1499b4aa73d04bc993234a8e3b4e6248eac299a
+  languageName: node
+  linkType: hard
+
+"@keplr-wallet/types@npm:^0.12.230":
+  version: 0.12.230
+  resolution: "@keplr-wallet/types@npm:0.12.230"
+  dependencies:
+    long: ^4.0.0
+  peerDependencies:
+    starknet: ^6
+  checksum: f6a55ecda1b6f0a35d597da692198b9854676c315d137a58b09f14f68f2e712bc90154ef36beba22fac97a6fad41423b6a962a6f8d4e30488cc37d5e9fbf26e4
   languageName: node
   linkType: hard
 
@@ -9137,7 +9148,7 @@ __metadata:
     "@keplr-wallet/common": ^0.12.96
     "@keplr-wallet/cosmos": ^0.12.96
     "@keplr-wallet/provider-extension": ^0.12.96
-    "@keplr-wallet/types": ^0.12.96
+    "@keplr-wallet/types": ^0.12.230
     "@keplr-wallet/unit": ^0.12.96
     "@types/node": ^16.18.48
     "@types/react": ^18.2.21
