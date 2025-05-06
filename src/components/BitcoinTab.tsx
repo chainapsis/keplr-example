@@ -183,12 +183,16 @@ export const BitcoinTab: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      const keplr = window.keplr;
-      if (keplr) {
-        const accounts = await keplr.bitcoin.getAccounts();
-        if (accounts.length === 0) {
-          await keplr.bitcoin.connectWallet();
+      try {
+        const keplr = window.keplr;
+        if (keplr) {
+          const accounts = await keplr.bitcoin.getAccounts();
+          if (accounts.length === 0) {
+            await keplr.bitcoin.connectWallet();
+          }
         }
+      } catch (error) {
+        console.error("Error initializing:", error);
       }
     };
     init();
@@ -211,13 +215,13 @@ export const BitcoinTab: React.FC = () => {
             </button>
 
             <div style={{ marginTop: "10px" }}>
-              <div className="info-row">
-                <span className="info-label">Address:</span>
-                <span className="info-value">{address || "Not connected"}</span>
+              <div>
+                <span>Address: </span>
+                <span>{address || "Not connected"}</span>
               </div>
-              <div className="info-row">
-                <span className="info-label">Public Key:</span>
-                <span className="info-value">{publicKey || "N/A"}</span>
+              <div>
+                <span>Public Key: </span>
+                <span>{publicKey || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -420,7 +424,7 @@ export const BitcoinTab: React.FC = () => {
 
             {signPsbtResult && (
               <div style={{ marginTop: "10px" }}>
-                <div>Result:</div>
+                <div>Result: </div>
                 <pre
                   style={{
                     whiteSpace: "pre-wrap",
