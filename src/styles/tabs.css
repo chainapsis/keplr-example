@@ -1,0 +1,26 @@
+.tabs-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.tab-button {
+  flex: 1;
+  max-width: 180px;
+  min-width: 120px;
+}
+
+@media screen and (max-width: 768px) {
+  .tabs-navigation {
+    flex-wrap: wrap;
+    max-width: 90vw;
+  }
+
+  .tab-button {
+    flex: 1 0 40%;
+    margin-bottom: 10px;
+  }
+}

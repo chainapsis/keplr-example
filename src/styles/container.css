@@ -17,3 +17,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
+
+@media screen and (max-width: 768px) {
+  .item-container {
+    grid-template-columns: 1fr;
+    min-width: 90vw;
+    width: 100%;
+  }
+}
