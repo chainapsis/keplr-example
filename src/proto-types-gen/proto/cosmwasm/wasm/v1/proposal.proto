@@ -39,7 +39,7 @@ message InstantiateContractProposal {
   string admin = 4;
   // CodeID is the reference to the stored WASM code
   uint64 code_id = 5 [ (gogoproto.customname) = "CodeID" ];
-  // Label is optional metadata to be stored with a constract instance.
+  // Label is optional metadata to be stored with a construct instance.
   string label = 6;
   // Msg json encoded message to be passed to the contract on instantiation
   bytes msg = 7 [ (gogoproto.casttype) = "RawContractMessage" ];
