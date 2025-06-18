@@ -14,6 +14,10 @@ export const EvmTab: React.FC = () => {
   const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
     useState<any>();
 
+  // Check for experimental=true in URL
+  const searchParams = new URLSearchParams(window.location.search);
+  const isExperimental = searchParams.get("experimental") === "true";
+
   useEffect(() => {
     const init = async () => {
       const keplr = window.keplr;
@@ -66,7 +70,7 @@ export const EvmTab: React.FC = () => {
         <AddEVMChain />
         <SwitchEVMChain />
         <AddERC20Token />
-        <EIP5792 />
+        {isExperimental && <EIP5792 />}
       </div>
     </>
   );
