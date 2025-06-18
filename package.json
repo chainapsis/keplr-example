@@ -9,19 +9,21 @@
     "@keplr-wallet/provider-extension": "^0.12.96",
     "@keplr-wallet/types": "^0.12.230",
     "@keplr-wallet/unit": "^0.12.96",
-    "@types/node": "^16.18.48",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
+    "@types/node": "24.0.3",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
     "bitcoinjs-lib": "^6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-scripts": "5.0.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.8.3",
+    "viem": "^2.31.2"
   },
   "scripts": {
     "start": "react-app-rewired start",
     "dev": "react-app-rewired start",
     "build": "react-app-rewired build",
+    "dev:build": "serve -s build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "proto-build": "zx ./src/proto-types-gen/scripts/proto-gen.mjs"
