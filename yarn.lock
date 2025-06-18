@@ -9296,7 +9296,7 @@ __metadata:
     stream-http: ^3.2.0
     ts-proto: ^1.157.0
     typescript: ^5.8.3
-    viem: ^2.31.2
+    viem: ^2.31.3
     zx: ^7.2.3
   languageName: unknown
   linkType: soft
@@ -13859,7 +13859,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.31.2":
+"viem@npm:^2.31.3":
   version: 2.31.3
   resolution: "viem@npm:2.31.3"
   dependencies:

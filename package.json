@@ -17,7 +17,7 @@
     "react-dom": "19.1.0",
     "react-scripts": "5.0.1",
     "typescript": "^5.8.3",
-    "viem": "^2.31.2"
+    "viem": "^2.31.3"
   },
   "scripts": {
     "start": "react-app-rewired start",
