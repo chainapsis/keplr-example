@@ -1,6 +1,76 @@
 import React, { useState, useEffect } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { isAddress } from "@ethersproject/address";
+import {
+  createWalletClient,
+  custom,
+  extractChain,
+  GetCallsStatusReturnType,
+  GetCapabilitiesReturnType,
+} from "viem";
+import { base, mainnet, optimism } from "viem/chains";
+
+export const EvmTab: React.FC = () => {
+  const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
+    useState<any>();
+
+  useEffect(() => {
+    const init = async () => {
+      const keplr = window.keplr;
+      if (keplr) {
+        if (!keplr.ethereum?.isConnected()) {
+          try {
+            await keplr.ethereum?.enable();
+          } catch (e) {
+            if (e instanceof Error) {
+              console.log(e.message);
+            }
+          }
+        }
+      }
+    };
+
+    const handleAnnounceProvider = (e: Event) => {
+      const event = e as CustomEvent;
+      if (event.detail.info.rdns === "app.keplr") {
+        setKeplrEip6963ProviderInfo(event.detail.info);
+      }
+    };
+
+    init();
+    window.addEventListener("eip6963:announceProvider", handleAnnounceProvider);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+    return () => {
+      window.removeEventListener(
+        "eip6963:announceProvider",
+        handleAnnounceProvider
+      );
+    };
+  }, []);
+
+  return (
+    <>
+      <h2 style={{ marginTop: "30px" }}>
+        Request to EVM Chain via Keplr Ethereum Provider
+      </h2>
+      <div
+        className="item-container"
+        style={{ maxWidth: 576, overflowWrap: "anywhere" }}
+      >
+        <ProviderInfo providerInfo={keplrEip6963ProviderInfo} />
+        <WalletData />
+        <RpcData />
+        <SignData />
+        <SendNativeToken />
+        <AddEVMChain />
+        <SwitchEVMChain />
+        <AddERC20Token />
+        <EIP5792 />
+      </div>
+    </>
+  );
+};
 
 const ProviderInfo: React.FC<{ providerInfo: any }> = ({ providerInfo }) => {
   if (!providerInfo) return null;
@@ -422,63 +492,221 @@ const AddERC20Token: React.FC = () => {
   );
 };
 
-export const EvmTab: React.FC = () => {
-  const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
-    useState<any>();
+const EIP5792: React.FC = () => {
+  const [walletCapabilities, setWalletCapabilities] =
+    useState<GetCapabilitiesReturnType | null>(null);
+  const [sendCallsResult, setSendCallsResult] = useState<string | null>(null);
+  const [getCallsStatusResult, setGetCallsStatusResult] =
+    useState<GetCallsStatusReturnType | null>(null);
+  const [getCallsStatusId, setGetCallsStatusId] = useState<string>("");
+  const [showCallsStatusId, setShowCallsStatusId] = useState<string>("");
 
-  useEffect(() => {
-    const init = async () => {
-      const keplr = window.keplr;
-      if (keplr) {
-        if (!keplr.ethereum?.isConnected()) {
-          try {
-            await keplr.ethereum?.enable();
-          } catch (e) {
-            if (e instanceof Error) {
-              console.log(e.message);
-            }
-          }
-        }
-      }
-    };
+  // For sendCalls input management
+  const [calls, setCalls] = useState<{ address: string; amount: string }[]>([
+    { address: "", amount: "" },
+  ]);
 
-    const handleAnnounceProvider = (e: Event) => {
-      const event = e as CustomEvent;
-      if (event.detail.info.rdns === "app.keplr") {
-        setKeplrEip6963ProviderInfo(event.detail.info);
-      }
-    };
+  const client = createWalletClient({
+    transport: custom(window.keplr?.ethereum),
+  });
 
-    init();
-    window.addEventListener("eip6963:announceProvider", handleAnnounceProvider);
-    window.dispatchEvent(new Event("eip6963:requestProvider"));
+  const getWalletCapabilities = async () => {
+    const capabilities = await client.getCapabilities({});
+    setWalletCapabilities(capabilities);
+  };
 
-    return () => {
-      window.removeEventListener(
-        "eip6963:announceProvider",
-        handleAnnounceProvider
-      );
-    };
-  }, []);
+  const sendCalls = async () => {
+    const chainId = await client.getChainId();
+    const sendCallsParams = calls.map((call) => ({
+      to: call.address as `0x${string}`,
+      value: BigInt(call.amount),
+    }));
+
+    const chain = extractChain({
+      chains: [base, mainnet, optimism],
+      id: chainId as any,
+    });
+
+    const { id } = await client.sendCalls({
+      calls: sendCallsParams,
+      chain,
+    });
+
+    setSendCallsResult(id);
+  };
+  const getCallsStatus = async () => {
+    if (!getCallsStatusId) return;
+    const status = await client.getCallsStatus({
+      id: getCallsStatusId,
+    });
+    setGetCallsStatusResult(status);
+  };
+  const showCallsStatus = async () => {
+    if (!showCallsStatusId) return;
+    await client.showCallsStatus({
+      id: showCallsStatusId,
+    });
+  };
+
+  const renderResult = (result: any) => (
+    <div style={{ marginTop: 8 }}>
+      {result ? (
+        <pre
+          style={{
+            background: "#f5f5f5",
+            padding: "8px",
+            borderRadius: "4px",
+            maxHeight: "200px",
+            overflow: "auto",
+            fontSize: "13px",
+          }}
+        >
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      ) : (
+        <span style={{ color: "#888" }}>No result</span>
+      )}
+    </div>
+  );
+
+  // Add a new call input box (up to 5)
+  const addCall = () => {
+    if (calls.length < 5) {
+      setCalls([...calls, { address: "", amount: "" }]);
+    }
+  };
+
+  // Remove a call input box
+  const removeCall = (idx: number) => {
+    setCalls(calls.filter((_, i) => i !== idx));
+  };
+
+  // Update a call input
+  const updateCall = (
+    idx: number,
+    field: "address" | "amount",
+    value: string
+  ) => {
+    setCalls(
+      calls.map((call, i) => (i === idx ? { ...call, [field]: value } : call))
+    );
+  };
 
   return (
-    <>
-      <h2 style={{ marginTop: "30px" }}>
-        Request to EVM Chain via Keplr Ethereum Provider
-      </h2>
-      <div
-        className="item-container"
-        style={{ maxWidth: 576, overflowWrap: "anywhere" }}
-      >
-        <ProviderInfo providerInfo={keplrEip6963ProviderInfo} />
-        <WalletData />
-        <RpcData />
-        <SignData />
-        <SendNativeToken />
-        <AddEVMChain />
-        <SwitchEVMChain />
-        <AddERC20Token />
+    <div className="item">
+      <div className="item-title">EIP-5792: Wallet Calls</div>
+      <div className="item-content">
+        <div className="sub-item">
+          <div className="sub-item-title">Get Wallet Capabilities</div>
+          <div className="sub-item-content">
+            <button className="keplr-button" onClick={getWalletCapabilities}>
+              wallet_getCapabilities
+            </button>
+            {renderResult(walletCapabilities)}
+          </div>
+        </div>
+
+        <div className="sub-item">
+          <div className="sub-item-title">Send Calls</div>
+          <div className="sub-item-content">
+            {calls.map((call, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Address"
+                  value={call.address}
+                  onChange={(e) => updateCall(idx, "address", e.target.value)}
+                  style={{ flex: 2, minWidth: 0 }}
+                />
+                <input
+                  type="number"
+                  placeholder="Amount"
+                  value={call.amount}
+                  onChange={(e) => updateCall(idx, "amount", e.target.value)}
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+                {calls.length > 1 && (
+                  <button
+                    className="keplr-button"
+                    style={{
+                      background: "#eee",
+                      color: "#333",
+                      width: 28,
+                      minWidth: 28,
+                      height: 28,
+                      padding: 0,
+                      flex: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      lineHeight: 1,
+                    }}
+                    onClick={() => removeCall(idx)}
+                    title="Remove"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              className="keplr-button"
+              onClick={addCall}
+              disabled={calls.length >= 5}
+              style={{ marginBottom: 10 }}
+            >
+              + Add Call
+            </button>
+            <button className="keplr-button" onClick={sendCalls}>
+              wallet_sendCalls
+            </button>
+            {renderResult(sendCallsResult)}
+          </div>
+        </div>
+
+        <div className="sub-item">
+          <div className="sub-item-title">Get Calls Status</div>
+          <div className="sub-item-content">
+            <input
+              type="text"
+              placeholder="Enter id"
+              value={getCallsStatusId}
+              onChange={(e) => setGetCallsStatusId(e.target.value)}
+              style={{ marginBottom: 8, width: "100%" }}
+            />
+            <button className="keplr-button" onClick={getCallsStatus}>
+              wallet_getCallsStatus
+            </button>
+            {renderResult(getCallsStatusResult)}
+          </div>
+        </div>
+
+        <div className="sub-item">
+          <div className="sub-item-title">Show Calls Status</div>
+          <div className="sub-item-content">
+            <input
+              type="text"
+              placeholder="Enter id"
+              value={showCallsStatusId}
+              onChange={(e) => setShowCallsStatusId(e.target.value)}
+              style={{ marginBottom: 8, width: "100%" }}
+            />
+            <button className="keplr-button" onClick={showCallsStatus}>
+              wallet_showCallsStatus
+            </button>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
