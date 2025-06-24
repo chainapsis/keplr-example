@@ -509,83 +509,251 @@ const EIP5792: React.FC = () => {
   const [calls, setCalls] = useState<{ address: string; amount: string }[]>([
     { address: "", amount: "" },
   ]);
+  const [showFullResults, setShowFullResults] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [toastMessage, setToastMessage] = useState<string>("");
 
   const client = createWalletClient({
     transport: custom(window.keplr?.ethereum),
   });
 
   const getWalletCapabilities = async () => {
-    const capabilities = await client.getCapabilities({});
-    setWalletCapabilities(capabilities);
+    try {
+      setErrors((prev) => ({ ...prev, walletCapabilities: "" }));
+      const capabilities = await client.getCapabilities({});
+      setWalletCapabilities(capabilities);
+    } catch (error) {
+      console.error("getWalletCapabilities error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        walletCapabilities:
+          error instanceof Error ? error.message : "Unknown error",
+      }));
+      setWalletCapabilities(null);
+    }
   };
 
   const sendCalls = async () => {
-    const chainId = await client.getChainId();
-    const sendCallsParams = calls.map((call) => ({
-      to: call.address as `0x${string}`,
-      value: BigInt(call.amount),
-    }));
+    try {
+      setErrors((prev) => ({ ...prev, sendCalls: "" }));
+      const chainId = await client.getChainId();
+      const sendCallsParams = calls.map((call) => ({
+        to: call.address as `0x${string}`,
+        value: BigInt(call.amount),
+      }));
 
-    const chain = extractChain({
-      chains: [base, mainnet, optimism],
-      id: chainId as any,
-    });
+      const chain = extractChain({
+        chains: [base, mainnet, optimism],
+        id: chainId as any,
+      });
 
-    const { id } = await client.sendCalls({
-      calls: sendCallsParams,
-      chain,
-    });
+      const { id } = await client.sendCalls({
+        calls: sendCallsParams,
+        chain,
+      });
 
-    setSendCallsResult(id);
+      setSendCallsResult(id);
+    } catch (error) {
+      console.error("sendCalls error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        sendCalls: error instanceof Error ? error.message : "Unknown error",
+      }));
+      setSendCallsResult(null);
+    }
   };
   const getCallsStatus = async () => {
     if (!getCallsStatusId) return;
-    const status = await client.getCallsStatus({
-      id: getCallsStatusId,
-    });
-    setGetCallsStatusResult(status);
+    try {
+      setErrors((prev) => ({ ...prev, getCallsStatus: "" }));
+      const status = await client.getCallsStatus({
+        id: getCallsStatusId,
+      });
+
+      setGetCallsStatusResult(status);
+    } catch (error) {
+      console.error("getCallsStatus error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        getCallsStatus:
+          error instanceof Error ? error.message : "Unknown error",
+      }));
+      setGetCallsStatusResult(null);
+    }
   };
   const showCallsStatus = async () => {
     if (!showCallsStatusId) return;
-    await client.showCallsStatus({
-      id: showCallsStatusId,
-    });
+    try {
+      setErrors((prev) => ({ ...prev, showCallsStatus: "" }));
+      await client.showCallsStatus({
+        id: showCallsStatusId,
+      });
+    } catch (error) {
+      console.error("showCallsStatus error:", error);
+      setErrors((prev) => ({
+        ...prev,
+        showCallsStatus:
+          error instanceof Error ? error.message : "Unknown error",
+      }));
+    }
   };
 
-  const renderResult = (result: any) => (
-    <div style={{ marginTop: 8 }}>
-      {result ? (
-        <pre
-          style={{
-            background: "#f5f5f5",
-            padding: "8px",
-            borderRadius: "4px",
-            maxHeight: "200px",
-            overflow: "auto",
-            fontSize: "13px",
-          }}
-        >
-          {JSON.stringify(result, null, 2)}
-        </pre>
-      ) : (
-        <span style={{ color: "#888" }}>No result</span>
-      )}
-    </div>
-  );
+  const renderError = (errorKey: string) => {
+    const error = errors[errorKey];
+    if (!error) return null;
 
-  // Add a new call input box (up to 5)
+    return (
+      <div
+        style={{
+          marginTop: 8,
+          padding: "8px",
+          background: "#ffe6e6",
+          border: "1px solid #ff9999",
+          borderRadius: "4px",
+          color: "#cc0000",
+          fontSize: "13px",
+        }}
+      >
+        Error: {error}
+      </div>
+    );
+  };
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(""), 2000);
+  };
+
+  const renderCopyableResult = (result: string | null) => {
+    const copyToClipboard = async (text: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Copied!");
+      } catch (err) {
+        console.error("Copy failed:", err);
+        showToast("Copy failed!");
+      }
+    };
+
+    return (
+      <div style={{ marginTop: 8 }}>
+        {result ? (
+          <div
+            onClick={() => copyToClipboard(result)}
+            style={{
+              background: "#f0f8ff",
+              padding: "8px",
+              borderRadius: "4px",
+              fontSize: "13px",
+              cursor: "pointer",
+              border: "1px solid #ddd",
+              fontFamily: "monospace",
+              wordBreak: "break-all",
+            }}
+            title="Click to copy"
+          >
+            {result}
+          </div>
+        ) : (
+          <span style={{ color: "#888" }}>No result</span>
+        )}
+      </div>
+    );
+  };
+
+  const renderResult = (
+    result: any,
+    resultKey: string,
+    allowTruncate: boolean = true
+  ) => {
+    const showFull = showFullResults[resultKey] || false;
+
+    return (
+      <div style={{ marginTop: 8 }}>
+        {result ? (
+          <div>
+            {allowTruncate && (
+              <button
+                onClick={() =>
+                  setShowFullResults((prev) => ({
+                    ...prev,
+                    [resultKey]: !showFull,
+                  }))
+                }
+                style={{
+                  marginBottom: 8,
+                  padding: "4px 8px",
+                  fontSize: "12px",
+                  background: "#ddd",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {showFull ? "Show Less" : "Show More"}
+              </button>
+            )}
+            <pre
+              style={{
+                background: "#f5f5f5",
+                padding: "8px",
+                borderRadius: "4px",
+                maxHeight: "300px",
+                overflow: "auto",
+                fontSize: "12px",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all",
+                maxWidth: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              {JSON.stringify(
+                result,
+                (key, value) => {
+                  if (typeof value === "bigint") {
+                    return value.toString();
+                  }
+                  if (
+                    !allowTruncate ||
+                    showFull ||
+                    key === "id" ||
+                    key === "transactionHash" ||
+                    key === "hash"
+                  ) {
+                    return value;
+                  }
+                  if (
+                    typeof value === "string" &&
+                    value.startsWith("0x") &&
+                    value.length > 20
+                  ) {
+                    return value.slice(0, 10) + "..." + value.slice(-6);
+                  }
+                  return value;
+                },
+                2
+              )}
+            </pre>
+          </div>
+        ) : (
+          <span style={{ color: "#888" }}>No result</span>
+        )}
+      </div>
+    );
+  };
+
   const addCall = () => {
     if (calls.length < 5) {
       setCalls([...calls, { address: "", amount: "" }]);
     }
   };
 
-  // Remove a call input box
   const removeCall = (idx: number) => {
     setCalls(calls.filter((_, i) => i !== idx));
   };
 
-  // Update a call input
   const updateCall = (
     idx: number,
     field: "address" | "amount",
@@ -597,120 +765,146 @@ const EIP5792: React.FC = () => {
   };
 
   return (
-    <div className="item">
-      <div className="item-title">EIP-5792: Wallet Calls</div>
-      <div className="item-content">
-        <div className="sub-item">
-          <div className="sub-item-title">Get Wallet Capabilities</div>
-          <div className="sub-item-content">
-            <button className="keplr-button" onClick={getWalletCapabilities}>
-              wallet_getCapabilities
-            </button>
-            {renderResult(walletCapabilities)}
-          </div>
+    <>
+      {toastMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            background: "#4CAF50",
+            color: "white",
+            padding: "12px 20px",
+            borderRadius: "4px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+            fontSize: "14px",
+            fontWeight: "500",
+          }}
+        >
+          {toastMessage}
         </div>
+      )}
 
-        <div className="sub-item">
-          <div className="sub-item-title">Send Calls</div>
-          <div className="sub-item-content">
-            {calls.map((call, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 8,
-                }}
+      <div className="item">
+        <div className="item-title">EIP-5792: Wallet Calls</div>
+        <div className="item-content">
+          <div className="sub-item">
+            <div className="sub-item-title">Get Wallet Capabilities</div>
+            <div className="sub-item-content">
+              <button className="keplr-button" onClick={getWalletCapabilities}>
+                wallet_getCapabilities
+              </button>
+              {renderError("walletCapabilities")}
+              {renderResult(walletCapabilities, "walletCapabilities")}
+            </div>
+          </div>
+
+          <div className="sub-item">
+            <div className="sub-item-title">Send Calls</div>
+            <div className="sub-item-content">
+              {calls.map((call, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 8,
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    value={call.address}
+                    onChange={(e) => updateCall(idx, "address", e.target.value)}
+                    style={{ flex: 2, minWidth: 0 }}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    value={call.amount}
+                    onChange={(e) => updateCall(idx, "amount", e.target.value)}
+                    style={{ flex: 1, minWidth: 0 }}
+                  />
+                  {calls.length > 1 && (
+                    <button
+                      className="keplr-button"
+                      style={{
+                        background: "#eee",
+                        color: "#333",
+                        width: 28,
+                        minWidth: 28,
+                        height: 28,
+                        padding: 0,
+                        flex: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                      }}
+                      onClick={() => removeCall(idx)}
+                      title="Remove"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                className="keplr-button"
+                onClick={addCall}
+                disabled={calls.length >= 5}
+                style={{ marginBottom: 10 }}
               >
-                <input
-                  type="text"
-                  placeholder="Address"
-                  value={call.address}
-                  onChange={(e) => updateCall(idx, "address", e.target.value)}
-                  style={{ flex: 2, minWidth: 0 }}
-                />
-                <input
-                  type="number"
-                  placeholder="Amount"
-                  value={call.amount}
-                  onChange={(e) => updateCall(idx, "amount", e.target.value)}
-                  style={{ flex: 1, minWidth: 0 }}
-                />
-                {calls.length > 1 && (
-                  <button
-                    className="keplr-button"
-                    style={{
-                      background: "#eee",
-                      color: "#333",
-                      width: 28,
-                      minWidth: 28,
-                      height: 28,
-                      padding: 0,
-                      flex: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 18,
-                      fontWeight: "bold",
-                      lineHeight: 1,
-                    }}
-                    onClick={() => removeCall(idx)}
-                    title="Remove"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              className="keplr-button"
-              onClick={addCall}
-              disabled={calls.length >= 5}
-              style={{ marginBottom: 10 }}
-            >
-              + Add Call
-            </button>
-            <button className="keplr-button" onClick={sendCalls}>
-              wallet_sendCalls
-            </button>
-            {renderResult(sendCallsResult)}
+                + Add Call
+              </button>
+              <button className="keplr-button" onClick={sendCalls}>
+                wallet_sendCalls
+              </button>
+              {renderError("sendCalls")}
+              {renderCopyableResult(sendCallsResult)}
+            </div>
           </div>
-        </div>
 
-        <div className="sub-item">
-          <div className="sub-item-title">Get Calls Status</div>
-          <div className="sub-item-content">
-            <input
-              type="text"
-              placeholder="Enter id"
-              value={getCallsStatusId}
-              onChange={(e) => setGetCallsStatusId(e.target.value)}
-              style={{ marginBottom: 8, width: "100%" }}
-            />
-            <button className="keplr-button" onClick={getCallsStatus}>
-              wallet_getCallsStatus
-            </button>
-            {renderResult(getCallsStatusResult)}
+          <div className="sub-item">
+            <div className="sub-item-title">Get Calls Status</div>
+            <div className="sub-item-content">
+              <input
+                type="text"
+                placeholder="Enter id"
+                value={getCallsStatusId}
+                onChange={(e) => setGetCallsStatusId(e.target.value)}
+                style={{ marginBottom: 8, width: "100%" }}
+              />
+              <button className="keplr-button" onClick={getCallsStatus}>
+                wallet_getCallsStatus
+              </button>
+              {renderError("getCallsStatus")}
+              {renderResult(getCallsStatusResult, "getCallsStatusResult")}
+            </div>
           </div>
-        </div>
 
-        <div className="sub-item">
-          <div className="sub-item-title">Show Calls Status</div>
-          <div className="sub-item-content">
-            <input
-              type="text"
-              placeholder="Enter id"
-              value={showCallsStatusId}
-              onChange={(e) => setShowCallsStatusId(e.target.value)}
-              style={{ marginBottom: 8, width: "100%" }}
-            />
-            <button className="keplr-button" onClick={showCallsStatus}>
-              wallet_showCallsStatus
-            </button>
+          <div className="sub-item">
+            <div className="sub-item-title">Show Calls Status</div>
+            <div className="sub-item-content">
+              <input
+                type="text"
+                placeholder="Enter id"
+                value={showCallsStatusId}
+                onChange={(e) => setShowCallsStatusId(e.target.value)}
+                style={{ marginBottom: 8, width: "100%" }}
+              />
+              <button className="keplr-button" onClick={showCallsStatus}>
+                wallet_showCallsStatus
+              </button>
+              {renderError("showCallsStatus")}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
