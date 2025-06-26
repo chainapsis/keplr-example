@@ -8,7 +8,15 @@ import {
   GetCallsStatusReturnType,
   GetCapabilitiesReturnType,
 } from "viem";
-import { base, mainnet, optimism } from "viem/chains";
+import {
+  arbitrum,
+  base,
+  berachain,
+  mainnet,
+  optimism,
+  sepolia,
+  unichain,
+} from "viem/chains";
 
 export const EvmTab: React.FC = () => {
   const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
@@ -545,7 +553,16 @@ const EIP5792: React.FC = () => {
       }));
 
       const chain = extractChain({
-        chains: [base, mainnet, optimism],
+        chains: [
+          base,
+          mainnet,
+          optimism,
+          arbitrum,
+          unichain,
+          berachain,
+
+          sepolia,
+        ],
         id: chainId as any,
       });
 
