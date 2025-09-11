@@ -41,9 +41,7 @@ function App() {
             key={tab.id}
             className="keplr-button tab-button"
             onClick={() => setActiveTab(tab.id as TabType)}
-            style={{
-              backgroundColor: activeTab === tab.id ? undefined : "#3C3C3C",
-            }}
+            style={activeTab === tab.id ? undefined : { opacity: 0.7 }}
           >
             {tab.label}
           </button>
