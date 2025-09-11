@@ -8,6 +8,7 @@ import "./styles/container.css";
 import "./styles/button.css";
 import "./styles/item.css";
 import "./styles/tabs.css";
+import "./styles/typography.css";
 
 type TabType = "osmosis" | "evm" | "starknet" | "bitcoin";
 
