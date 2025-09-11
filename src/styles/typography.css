@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "Neutral Sans";
+  src: url("../assets/fonts/neutral-sans/VF/NeutralSansVF.woff2")
+      format("woff2"),
+    url("../assets/fonts/neutral-sans/VF/NeutralSansVF.woff") format("woff");
+  font-weight: 100 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: "Neutral Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR",
+    "Malgun Gothic", "Nanum Gothic", Pretendard, sans-serif;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+}
