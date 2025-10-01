@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -22,9 +22,10 @@ export const EvmTab: React.FC = () => {
   const [keplrEip6963ProviderInfo, setKeplrEip6963ProviderInfo] =
     useState<any>();
 
-  // Check for experimental=true in URL
-  const searchParams = new URLSearchParams(window.location.search);
-  const isExperimental = searchParams.get("experimental") === "true";
+  const isExperimental = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get("experimental") === "true";
+  }, []);
 
   useEffect(() => {
     const init = async () => {
@@ -56,7 +57,7 @@ export const EvmTab: React.FC = () => {
     return () => {
       window.removeEventListener(
         "eip6963:announceProvider",
-        handleAnnounceProvider
+        handleAnnounceProvider,
       );
     };
   }, []);
@@ -130,7 +131,7 @@ const WalletData: React.FC = () => {
                 {method}
               </button>
             </div>
-          )
+          ),
         )}
         <div>Result: {result}</div>
       </div>
@@ -173,7 +174,7 @@ const RpcData: React.FC = () => {
                 {method}
               </button>
             </div>
-          )
+          ),
         )}
         <div>Result: {result}</div>
       </div>
@@ -333,7 +334,7 @@ const SendNativeToken: React.FC = () => {
 
     const currentChainId = window.keplr?.ethereum?._currentChainId;
     const currentChainInfo = await window.keplr?.getChainInfoWithoutEndpoints(
-      currentChainId
+      currentChainId,
     );
 
     if (currentChainInfo === undefined) {
@@ -345,7 +346,7 @@ const SendNativeToken: React.FC = () => {
     const amountValue = `0x${parseInt(
       new Dec(parsedAmount)
         .mulTruncate(DecUtils.getTenExponentN(mainCurrency.coinDecimals))
-        .toString()
+        .toString(),
     ).toString(16)}`;
 
     const tx = {
@@ -683,7 +684,7 @@ const EIP5792: React.FC = () => {
   const renderResult = (
     result: any,
     resultKey: string,
-    allowTruncate: boolean = true
+    allowTruncate: boolean = true,
   ) => {
     const showFull = showFullResults[resultKey] || false;
 
@@ -750,7 +751,7 @@ const EIP5792: React.FC = () => {
                   }
                   return value;
                 },
-                2
+                2,
               )}
             </pre>
           </div>
@@ -774,10 +775,10 @@ const EIP5792: React.FC = () => {
   const updateCall = (
     idx: number,
     field: "address" | "amount",
-    value: string
+    value: string,
   ) => {
     setCalls(
-      calls.map((call, i) => (i === idx ? { ...call, [field]: value } : call))
+      calls.map((call, i) => (i === idx ? { ...call, [field]: value } : call)),
     );
   };
 
