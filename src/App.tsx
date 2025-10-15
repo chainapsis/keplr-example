@@ -4,13 +4,14 @@ import { OsmosisTab } from "./components/OsmosisTab";
 import { EvmTab } from "./components/EvmTab";
 import { StarknetTab } from "./components/StarknetTab";
 import { BitcoinTab } from "./components/BitcoinTab";
+import { DeeplinkTab } from "./components/DeeplinkTab";
 import "./styles/container.css";
 import "./styles/button.css";
 import "./styles/item.css";
 import "./styles/tabs.css";
 import "./styles/typography.css";
 
-type TabType = "osmosis" | "evm" | "starknet" | "bitcoin";
+type TabType = "osmosis" | "evm" | "starknet" | "bitcoin" | "deeplink";
 
 function App() {
   const [activeTab, setActiveTab] = React.useState<TabType>("osmosis");
@@ -37,6 +38,7 @@ function App() {
           { id: "evm", label: "EVM" },
           { id: "starknet", label: "Starknet" },
           { id: "bitcoin", label: "Bitcoin" },
+          { id: "deeplink", label: "Deeplink" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -53,6 +55,7 @@ function App() {
       {activeTab === "evm" && <EvmTab />}
       {activeTab === "starknet" && <StarknetTab />}
       {activeTab === "bitcoin" && <BitcoinTab />}
+      {activeTab === "deeplink" && <DeeplinkTab />}
     </div>
   );
 }
