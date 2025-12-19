@@ -16,6 +16,8 @@ export const OsmosisTab: React.FC = () => {
   const [targetChainId, setTargetChainId] = useState<string>(
     OsmosisTestnetChainInfo.chainId,
   );
+  const [adr36Message, setAdr36Message] = useState<string>("");
+  const [adr36Signature, setAdr36Signature] = useState<string>("");
 
   const isExperimental = useMemo(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -146,6 +148,36 @@ export const OsmosisTab: React.FC = () => {
       } catch (e) {
         if (e instanceof Error) {
           console.log(e.message);
+        }
+      }
+    }
+  };
+
+  const signAdr36Message = async () => {
+    if (window.keplr && adr36Message.trim()) {
+      try {
+        const key = await window.keplr?.getKey(selectedChain.id);
+        if (key) {
+          const signature = await window.keplr.signArbitrary(
+            selectedChain.id,
+            key.bech32Address,
+            adr36Message,
+          );
+          setAdr36Signature(
+            JSON.stringify(
+              {
+                signature: signature.signature,
+                pub_key: signature.pub_key,
+              },
+              null,
+              2,
+            ),
+          );
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e.message);
+          setAdr36Signature(`Error: ${e.message}`);
         }
       }
     }
@@ -298,6 +330,68 @@ export const OsmosisTab: React.FC = () => {
             <button className="keplr-button" onClick={sendBalance}>
               Send
             </button>
+          </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">Sign ADR-36 Message</div>
+
+          <div className="item-content">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              Message:
+              <textarea
+                value={adr36Message}
+                onChange={(e) => setAdr36Message(e.target.value)}
+                placeholder="Enter message to sign"
+                style={{
+                  minHeight: "80px",
+                  padding: "8px",
+                  fontSize: "14px",
+                  fontFamily: "monospace",
+                  resize: "vertical",
+                }}
+              />
+            </div>
+
+            <button
+              className="keplr-button"
+              onClick={signAdr36Message}
+              disabled={!adr36Message.trim()}
+              style={{
+                marginTop: "10px",
+                opacity: !adr36Message.trim() ? 0.5 : 1,
+                cursor: !adr36Message.trim() ? "not-allowed" : "pointer",
+              }}
+            >
+              Sign Message
+            </button>
+
+            {adr36Signature && (
+              <div style={{ marginTop: "15px" }}>
+                <div style={{ fontSize: "14px", marginBottom: "8px" }}>
+                  Signature:
+                </div>
+                <pre
+                  style={{
+                    background: "#f5f5f5",
+                    padding: "12px",
+                    borderRadius: "4px",
+                    overflow: "auto",
+                    fontSize: "12px",
+                    maxHeight: "200px",
+                    wordBreak: "break-all",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {adr36Signature}
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
