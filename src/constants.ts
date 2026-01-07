@@ -140,3 +140,223 @@ export const OsmosisChainInfo = {
     "osmosis-txfees",
   ],
 };
+
+export const CosmosHubChainInfo = {
+  rpc: "https://rpc-cosmoshub.keplr.app",
+  rest: "https://lcd-cosmoshub.keplr.app",
+  chainId: "cosmoshub-4",
+  chainName: "Cosmos Hub",
+  stakeCurrency: {
+    coinDenom: "ATOM",
+    coinMinimalDenom: "uatom",
+    coinDecimals: 6,
+    coinGeckoId: "cosmos",
+  },
+  bip44: { coinType: 118 },
+  bech32Config: {
+    bech32PrefixAccAddr: "cosmos",
+    bech32PrefixAccPub: "cosmospub",
+    bech32PrefixValAddr: "cosmosvaloper",
+    bech32PrefixValPub: "cosmosvaloperpub",
+    bech32PrefixConsAddr: "cosmosvalcons",
+    bech32PrefixConsPub: "cosmosvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "ATOM",
+      coinMinimalDenom: "uatom",
+      coinDecimals: 6,
+      coinGeckoId: "cosmos",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "ATOM",
+      coinMinimalDenom: "uatom",
+      coinDecimals: 6,
+      coinGeckoId: "cosmos",
+      gasPriceStep: {
+        low: 0.01,
+        average: 0.025,
+        high: 0.03,
+      },
+    },
+  ],
+  features: ["ibc-transfer", "ibc-go"],
+};
+
+export const CelestiaChainInfo = {
+  rpc: "https://rpc-celestia.keplr.app",
+  rest: "https://lcd-celestia.keplr.app",
+  chainId: "celestia",
+  chainName: "Celestia",
+  stakeCurrency: {
+    coinDenom: "TIA",
+    coinMinimalDenom: "utia",
+    coinDecimals: 6,
+    coinGeckoId: "celestia",
+  },
+  bip44: { coinType: 118 },
+  bech32Config: {
+    bech32PrefixAccAddr: "celestia",
+    bech32PrefixAccPub: "celestiapub",
+    bech32PrefixValAddr: "celestiavaloper",
+    bech32PrefixValPub: "celestiavaloperpub",
+    bech32PrefixConsAddr: "celestiavalcons",
+    bech32PrefixConsPub: "celestiavalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "TIA",
+      coinMinimalDenom: "utia",
+      coinDecimals: 6,
+      coinGeckoId: "celestia",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "TIA",
+      coinMinimalDenom: "utia",
+      coinDecimals: 6,
+      coinGeckoId: "celestia",
+      gasPriceStep: {
+        low: 0.01,
+        average: 0.025,
+        high: 0.04,
+      },
+    },
+  ],
+  features: ["ibc-transfer", "ibc-go"],
+};
+
+export const InjectiveChainInfo = {
+  rpc: "https://rpc-injective.keplr.app",
+  rest: "https://lcd-injective.keplr.app",
+  chainId: "injective-1",
+  chainName: "Injective",
+  stakeCurrency: {
+    coinDenom: "INJ",
+    coinMinimalDenom: "inj",
+    coinDecimals: 18,
+    coinGeckoId: "injective-protocol",
+  },
+  bip44: { coinType: 60 },
+  bech32Config: {
+    bech32PrefixAccAddr: "inj",
+    bech32PrefixAccPub: "injpub",
+    bech32PrefixValAddr: "injvaloper",
+    bech32PrefixValPub: "injvaloperpub",
+    bech32PrefixConsAddr: "injvalcons",
+    bech32PrefixConsPub: "injvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "INJ",
+      coinMinimalDenom: "inj",
+      coinDecimals: 18,
+      coinGeckoId: "injective-protocol",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "INJ",
+      coinMinimalDenom: "inj",
+      coinDecimals: 18,
+      coinGeckoId: "injective-protocol",
+      gasPriceStep: {
+        low: 5000000000,
+        average: 25000000000,
+        high: 40000000000,
+      },
+    },
+  ],
+  features: ["ibc-transfer", "ibc-go"],
+};
+
+export const JunoChainInfo = {
+  rpc: "https://rpc-juno.keplr.app",
+  rest: "https://lcd-juno.keplr.app",
+  chainId: "juno-1",
+  chainName: "Juno",
+  stakeCurrency: {
+    coinDenom: "JUNO",
+    coinMinimalDenom: "ujuno",
+    coinDecimals: 6,
+    coinGeckoId: "juno-network",
+  },
+  bip44: { coinType: 118 },
+  bech32Config: {
+    bech32PrefixAccAddr: "juno",
+    bech32PrefixAccPub: "junopub",
+    bech32PrefixValAddr: "junovaloper",
+    bech32PrefixValPub: "junovaloperpub",
+    bech32PrefixConsAddr: "junovalcons",
+    bech32PrefixConsPub: "junovalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "JUNO",
+      coinMinimalDenom: "ujuno",
+      coinDecimals: 6,
+      coinGeckoId: "juno-network",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "JUNO",
+      coinMinimalDenom: "ujuno",
+      coinDecimals: 6,
+      coinGeckoId: "juno-network",
+      gasPriceStep: {
+        low: 0.001,
+        average: 0.0025,
+        high: 0.004,
+      },
+    },
+  ],
+  features: ["ibc-transfer", "ibc-go", "cosmwasm", "wasmd_0.24+"],
+};
+
+export const StargazeChainInfo = {
+  rpc: "https://rpc-stargaze.keplr.app",
+  rest: "https://lcd-stargaze.keplr.app",
+  chainId: "stargaze-1",
+  chainName: "Stargaze",
+  stakeCurrency: {
+    coinDenom: "STARS",
+    coinMinimalDenom: "ustars",
+    coinDecimals: 6,
+    coinGeckoId: "stargaze",
+  },
+  bip44: { coinType: 118 },
+  bech32Config: {
+    bech32PrefixAccAddr: "stars",
+    bech32PrefixAccPub: "starspub",
+    bech32PrefixValAddr: "starsvaloper",
+    bech32PrefixValPub: "starsvaloperpub",
+    bech32PrefixConsAddr: "starsvalcons",
+    bech32PrefixConsPub: "starsvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "STARS",
+      coinMinimalDenom: "ustars",
+      coinDecimals: 6,
+      coinGeckoId: "stargaze",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "STARS",
+      coinMinimalDenom: "ustars",
+      coinDecimals: 6,
+      coinGeckoId: "stargaze",
+      gasPriceStep: {
+        low: 0.5,
+        average: 1,
+        high: 2,
+      },
+    },
+  ],
+  features: ["ibc-transfer", "ibc-go", "cosmwasm", "wasmd_0.24+"],
+};
