@@ -2,22 +2,19 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types: [labeled]
 
 jobs:
   claude-review:
-    # Run for: organization members OR claude/ prefix branches from same repo
+    # Run when 'claude-review' label is added, and only for authorized users
     if: |
-      github.event.pull_request.author_association == 'OWNER' ||
-      github.event.pull_request.author_association == 'MEMBER' ||
-      github.event.pull_request.author_association == 'COLLABORATOR' ||
-      (startsWith(github.event.pull_request.head.ref, 'claude/') && github.event.pull_request.head.repo.full_name == github.repository)
+      contains(github.event.pull_request.labels.*.name, 'claude-review') &&
+      (github.event.pull_request.author_association == 'OWNER' ||
+       github.event.pull_request.author_association == 'MEMBER' ||
+       github.event.pull_request.author_association == 'COLLABORATOR' ||
+       github.event.pull_request.user.login == 'piatoss3612' ||
+       github.event.pull_request.user.login == 'Thunnini' ||
+       (startsWith(github.event.pull_request.head.ref, 'claude/') && github.event.pull_request.head.repo.full_name == github.repository))
 
     runs-on: ubuntu-latest
     permissions:
