@@ -12,11 +12,8 @@ on:
 
 jobs:
   claude-review:
-    # Only run for organization members, owners, and collaborators
-    if: |
-      github.event.pull_request.author_association == 'OWNER' ||
-      github.event.pull_request.author_association == 'MEMBER' ||
-      github.event.pull_request.author_association == 'COLLABORATOR'
+    # Only run for branches starting with 'claude/'
+    if: startsWith(github.event.pull_request.head.ref, 'claude/')
 
     runs-on: ubuntu-latest
     permissions:
