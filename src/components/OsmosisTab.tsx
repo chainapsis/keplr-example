@@ -1,6 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
-import { OsmosisChainInfo, OsmosisTestnetChainInfo } from "../constants";
+import {
+  OsmosisChainInfo,
+  OsmosisTestnetChainInfo,
+  CosmosHubChainInfo,
+  CelestiaChainInfo,
+  InjectiveChainInfo,
+  JunoChainInfo,
+  StargazeChainInfo,
+} from "../constants";
 import { Balances } from "../types/balance";
 import { api } from "../util/api";
 import { sendMsgs } from "../util/sendMsgs";
@@ -36,6 +44,31 @@ export const OsmosisTab: React.FC = () => {
         label: "Osmosis",
         info: OsmosisChainInfo,
       },
+      {
+        id: CosmosHubChainInfo.chainId,
+        label: "Cosmos Hub",
+        info: CosmosHubChainInfo,
+      },
+      {
+        id: CelestiaChainInfo.chainId,
+        label: "Celestia",
+        info: CelestiaChainInfo,
+      },
+      {
+        id: InjectiveChainInfo.chainId,
+        label: "Injective",
+        info: InjectiveChainInfo,
+      },
+      {
+        id: JunoChainInfo.chainId,
+        label: "Juno",
+        info: JunoChainInfo,
+      },
+      {
+        id: StargazeChainInfo.chainId,
+        label: "Stargaze",
+        info: StargazeChainInfo,
+      },
     ],
     [],
   );
@@ -43,6 +76,11 @@ export const OsmosisTab: React.FC = () => {
   const selectedChain = useMemo(
     () => chains.find((c) => c.id === targetChainId) ?? chains[0],
     [chains, targetChainId],
+  );
+
+  const stakeCurrency = useMemo(
+    () => selectedChain.info.stakeCurrency,
+    [selectedChain],
   );
 
   const init = useCallback(async () => {
@@ -75,17 +113,15 @@ export const OsmosisTab: React.FC = () => {
 
       const data = await api<Balances>(uri);
       const balance = data.balances.find(
-        (balance) => balance.denom === "uosmo",
+        (balance) => balance.denom === stakeCurrency.coinMinimalDenom,
       );
-      const osmoDecimal = selectedChain.info.currencies.find(
-        (currency) => currency.coinMinimalDenom === "uosmo",
-      )?.coinDecimals;
+      const decimal = stakeCurrency.coinDecimals;
 
       if (balance) {
-        const amount = new Dec(balance.amount, osmoDecimal);
-        setBalance(`${amount.toString(osmoDecimal)} OSMO`);
+        const amount = new Dec(balance.amount, decimal);
+        setBalance(`${amount.toString(decimal)} ${stakeCurrency.coinDenom}`);
       } else {
-        setBalance(`0 OSMO`);
+        setBalance(`0 ${stakeCurrency.coinDenom}`);
       }
     }
   };
@@ -93,6 +129,9 @@ export const OsmosisTab: React.FC = () => {
   const sendBalance = async () => {
     if (window.keplr) {
       const key = await window.keplr?.getKey(selectedChain.id);
+      const denom = stakeCurrency.coinMinimalDenom;
+      const decimals = stakeCurrency.coinDecimals;
+
       const protoMsgs = {
         typeUrl: "/cosmos.bank.v1beta1.MsgSend",
         value: MsgSend.encode({
@@ -100,8 +139,8 @@ export const OsmosisTab: React.FC = () => {
           toAddress: recipient,
           amount: [
             {
-              denom: "uosmo",
-              amount: DecUtils.getTenExponentN(6)
+              denom: denom,
+              amount: DecUtils.getTenExponentN(decimals)
                 .mul(new Dec(amount))
                 .truncate()
                 .toString(),
@@ -120,7 +159,7 @@ export const OsmosisTab: React.FC = () => {
             key.bech32Address,
             [protoMsgs],
             {
-              amount: [{ denom: "uosmo", amount: "236" }],
+              amount: [{ denom: denom, amount: "236" }],
               gas: defaultGas,
             },
           );
@@ -129,7 +168,7 @@ export const OsmosisTab: React.FC = () => {
             selectedChain.info as any,
             key.bech32Address,
             [protoMsgs],
-            [{ denom: "uosmo", amount: "236" }],
+            [{ denom: denom, amount: "236" }],
           );
 
           if (gasUsed) {
@@ -139,7 +178,7 @@ export const OsmosisTab: React.FC = () => {
               key.bech32Address,
               [protoMsgs],
               {
-                amount: [{ denom: "uosmo", amount: "236" }],
+                amount: [{ denom: denom, amount: "236" }],
                 gas: Math.floor(gasUsed * 1.5).toString(),
               },
             );
@@ -197,32 +236,30 @@ export const OsmosisTab: React.FC = () => {
       </h2>
 
       <div className="item-container">
-        {isExperimental && (
-          <div className="item">
-            <div className="item-title">Switch Cosmos Chain</div>
-            <div className="item-content">
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                Chain:
-                <select
-                  value={targetChainId}
-                  onChange={(e) => setTargetChainId(e.target.value)}
-                >
-                  {chains.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div style={{ marginTop: "10px" }}>
-                Current Chain ID: {selectedChain.id}
-              </div>
+        <div className="item">
+          <div className="item-title">Switch Cosmos Chain</div>
+          <div className="item-content">
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              Chain:
+              <select
+                value={targetChainId}
+                onChange={(e) => setTargetChainId(e.target.value)}
+              >
+                {chains.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginTop: "10px" }}>
+              Current Chain ID: {selectedChain.id}
             </div>
           </div>
-        )}
+        </div>
 
         <div className="item">
-          <div className="item-title">Get OSMO Address</div>
+          <div className="item-title">Get {stakeCurrency.coinDenom} Address</div>
 
           <div className="item-content">
             <div>
@@ -235,7 +272,7 @@ export const OsmosisTab: React.FC = () => {
         </div>
 
         <div className="item">
-          <div className="item-title">Get OSMO Balance</div>
+          <div className="item-title">Get {stakeCurrency.coinDenom} Balance</div>
 
           <div className="item-content">
             <button className="keplr-button" onClick={getBalance}>
@@ -247,7 +284,7 @@ export const OsmosisTab: React.FC = () => {
         </div>
 
         <div className="item">
-          <div className="item-title">Send OSMO</div>
+          <div className="item-title">Send {stakeCurrency.coinDenom}</div>
 
           <div className="item-content">
             <div
