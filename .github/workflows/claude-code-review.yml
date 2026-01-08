@@ -12,8 +12,10 @@ on:
 
 jobs:
   claude-review:
-    # Only run for branches starting with 'claude/'
-    if: startsWith(github.event.pull_request.head.ref, 'claude/')
+    # Only run for branches starting with 'claude/' from the same repository (not forks)
+    if: |
+      startsWith(github.event.pull_request.head.ref, 'claude/') &&
+      github.event.pull_request.head.repo.full_name == github.repository
 
     runs-on: ubuntu-latest
     permissions:
