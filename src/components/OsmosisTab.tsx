@@ -18,6 +18,16 @@ export const OsmosisTab: React.FC = () => {
   );
   const [adr36Message, setAdr36Message] = useState<string>("");
   const [adr36Signature, setAdr36Signature] = useState<string>("");
+  // TODO: getAllWallets/switchAccount are not yet in @keplr-wallet/types. Remove type assertion when types are published.
+  const [wallets, setWallets] = useState<
+    {
+      id: string;
+      name: string;
+      isSelected: boolean;
+      addresses: { [chainId: string]: string };
+    }[]
+  >([]);
+  const [walletsError, setWalletsError] = useState<string>("");
 
   const isExperimental = useMemo(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -60,12 +70,28 @@ export const OsmosisTab: React.FC = () => {
     }
   }, [selectedChain]);
 
-  const getKeyFromKeplr = async () => {
+  const getKeyFromKeplr = useCallback(async () => {
     const key = await window.keplr?.getKey(selectedChain.id);
     if (key) {
       setAddress(key.bech32Address);
     }
-  };
+  }, [selectedChain.id]);
+
+  const fetchAllWallets = useCallback(async () => {
+    try {
+      setWalletsError("");
+      const keplr = window.keplr as any;
+      if (!keplr?.getAllWallets) {
+        return;
+      }
+      const result = await keplr.getAllWallets();
+      setWallets(result ?? []);
+    } catch (e) {
+      if (e instanceof Error) {
+        setWalletsError(e.message);
+      }
+    }
+  }, []);
 
   const getBalance = async () => {
     const key = await window.keplr?.getKey(selectedChain.id);
@@ -189,6 +215,19 @@ export const OsmosisTab: React.FC = () => {
     setAddress("");
     setBalance("");
   }, [init]);
+
+  useEffect(() => {
+    const handleKeyringChange = () => {
+
+      fetchAllWallets();
+      getKeyFromKeplr();
+    };
+
+    window.addEventListener("keplr_keystorechange", handleKeyringChange);
+    return () => {
+      window.removeEventListener("keplr_keystorechange", handleKeyringChange);
+    };
+  }, [fetchAllWallets, getKeyFromKeplr]);
 
   return (
     <>
@@ -332,6 +371,100 @@ export const OsmosisTab: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {isExperimental && (
+          <div className="item">
+            <div className="item-title">Wallet Management</div>
+
+            <div className="item-content">
+              <button
+                className="keplr-button"
+                onClick={fetchAllWallets}
+              >
+                Get All Wallets
+              </button>
+
+              {walletsError && (
+                <div style={{ color: "red", marginTop: "10px" }}>
+                  Error: {walletsError}
+                </div>
+              )}
+
+              {wallets.length > 0 && (
+                <div style={{ marginTop: "10px" }}>
+                  {wallets.map((wallet) => (
+                    <div
+                      key={wallet.id}
+                      style={{
+                        padding: "12px",
+                        margin: "4px 0",
+                        background: wallet.isSelected ? "#e8f5e9" : "#f5f5f5",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                          <div style={{ fontWeight: wallet.isSelected ? "bold" : "normal", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {wallet.name} {wallet.isSelected && "(selected)"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#666", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            ID: {wallet.id}
+                          </div>
+                        </div>
+                        {!wallet.isSelected && (
+                          <button
+                            style={{ flexShrink: 0, width: "auto" }}
+                            className="keplr-button"
+                            onClick={async () => {
+                              try {
+                                setWalletsError("");
+                                const keplr = window.keplr as any;
+                                await keplr?.switchAccount(wallet.id);
+                                const result = await keplr?.getAllWallets();
+                                setWallets(result ?? []);
+                              } catch (e) {
+                                if (e instanceof Error) {
+                                  setWalletsError(e.message);
+                                }
+                              }
+                            }}
+                          >
+                            Switch
+                          </button>
+                        )}
+                      </div>
+                      {wallet.addresses && Object.keys(wallet.addresses).length > 0 && (
+                        <div
+                          style={{
+                            marginTop: "8px",
+                            paddingTop: "8px",
+                            borderTop: "1px solid rgba(0,0,0,0.1)",
+                            fontSize: "12px",
+                            fontFamily: "monospace",
+                            wordBreak: "break-all",
+                          }}
+                        >
+                          {Object.entries(wallet.addresses).map(([chainId, addr]) => (
+                            <div key={chainId} style={{ marginBottom: "2px" }}>
+                              <span style={{ color: "#888" }}>{chainId}</span>:{" "}
+                              {addr as string}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="item">
           <div className="item-title">Sign ADR-36 Message</div>
