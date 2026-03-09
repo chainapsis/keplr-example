@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Dec, DecUtils } from "@keplr-wallet/unit";
 import { isAddress } from "@ethersproject/address";
 import {
@@ -72,6 +72,7 @@ export const EvmTab: React.FC = () => {
         style={{ maxWidth: 576, overflowWrap: "anywhere" }}
       >
         <ProviderInfo providerInfo={keplrEip6963ProviderInfo} />
+        <WalletManagement />
         <WalletData />
         <RpcData />
         <SignData />
@@ -109,8 +110,159 @@ const ProviderInfo: React.FC<{ providerInfo: any }> = ({ providerInfo }) => {
   );
 };
 
+// TODO: getAllWallets/switchAccount are not yet in @keplr-wallet/types. Remove type assertion when types are published.
+const WalletManagement: React.FC = () => {
+  const [wallets, setWallets] = useState<
+    {
+      id: string;
+      name: string;
+      isSelected: boolean;
+      addresses: { [chainId: string]: string };
+    }[]
+  >([]);
+  const [walletsError, setWalletsError] = useState<string>("");
+
+  const fetchAllWallets = useCallback(async () => {
+    try {
+      setWalletsError("");
+      const keplr = window.keplr as any;
+      if (!keplr?.getAllWallets) {
+        return;
+      }
+      const result = await keplr.getAllWallets();
+      setWallets(result ?? []);
+    } catch (e) {
+      if (e instanceof Error) {
+        setWalletsError(e.message);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keplr_keystorechange", fetchAllWallets);
+    return () => {
+      window.removeEventListener("keplr_keyring_changed", fetchAllWallets);
+    };
+  }, [fetchAllWallets]);
+
+  return (
+    <div className="item">
+      <div className="item-title">Wallet Management</div>
+      <div className="item-content">
+        <button
+          className="keplr-button"
+          onClick={fetchAllWallets}
+        >
+          Get All Wallets
+        </button>
+
+        {walletsError && (
+          <div style={{ color: "red", marginTop: "10px" }}>
+            Error: {walletsError}
+          </div>
+        )}
+
+        {wallets.length > 0 && (
+          <div style={{ marginTop: "10px" }}>
+            {wallets.map((wallet) => (
+              <div
+                key={wallet.id}
+                style={{
+                  padding: "12px",
+                  margin: "4px 0",
+                  background: wallet.isSelected ? "#e8f5e9" : "#f5f5f5",
+                  borderRadius: "4px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+                    <div style={{ fontWeight: wallet.isSelected ? "bold" : "normal", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {wallet.name} {wallet.isSelected && "(selected)"}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#666", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      ID: {wallet.id}
+                    </div>
+                  </div>
+                  {!wallet.isSelected && (
+                    <button
+                      style={{ flexShrink: 0, width: "auto" }}
+                      className="keplr-button"
+                      onClick={async () => {
+                        try {
+                          setWalletsError("");
+                          const keplr = window.keplr as any;
+                          await keplr?.switchAccount(wallet.id);
+                          const result = await keplr?.getAllWallets();
+                          setWallets(result ?? []);
+                        } catch (e) {
+                          if (e instanceof Error) {
+                            setWalletsError(e.message);
+                          }
+                        }
+                      }}
+                    >
+                      Switch
+                    </button>
+                  )}
+                </div>
+                {wallet.addresses && Object.keys(wallet.addresses).length > 0 && (
+                  <div
+                    style={{
+                      marginTop: "8px",
+                      paddingTop: "8px",
+                      borderTop: "1px solid rgba(0,0,0,0.1)",
+                      fontSize: "12px",
+                      fontFamily: "monospace",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {Object.entries(wallet.addresses).map(([chainId, addr]) => (
+                      <div key={chainId} style={{ marginBottom: "2px" }}>
+                        <span style={{ color: "#888" }}>{chainId}</span>:{" "}
+                        {addr as string}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const WalletData: React.FC = () => {
   const [result, setResult] = useState<string>("");
+
+  const fetchAccounts = useCallback(async () => {
+    try {
+      const accounts = await window.keplr?.ethereum?.request({
+        method: "eth_accounts",
+      });
+      if (accounts) {
+        setResult(accounts.toString());
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e.message);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keplr_keystorechange", fetchAccounts);
+    return () => {
+      window.removeEventListener("keplr_keystorechange", fetchAccounts);
+    };
+  }, [fetchAccounts]);
 
   return (
     <div className="item">
