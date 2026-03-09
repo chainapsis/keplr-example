@@ -72,7 +72,7 @@ export const EvmTab: React.FC = () => {
         style={{ maxWidth: 576, overflowWrap: "anywhere" }}
       >
         <ProviderInfo providerInfo={keplrEip6963ProviderInfo} />
-        <WalletManagement />
+        {isExperimental && <WalletManagement />}
         <WalletData />
         <RpcData />
         <SignData />
