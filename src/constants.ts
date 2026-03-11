@@ -141,99 +141,50 @@ export const OsmosisChainInfo = {
   ],
 };
 
-export const EvmosChainInfo = {
-  chainId: "evmos_9001-2",
-  chainName: "Evmos",
-  rpc: "https://evmos-rpc.publicnode.com:443",
-  rest: "https://evmos-rest.publicnode.com",
+export const ZetaChainInfo = {
+  chainId: "zetachain_7000-1",
+  chainName: "ZetaChain",
+  rpc: "https://rpc-zetachain.keplr.app",
+  rest: "https://lcd-zetachain.keplr.app",
   stakeCurrency: {
-    coinDenom: "EVMOS",
-    coinMinimalDenom: "aevmos",
+    coinDenom: "ZETA",
+    coinMinimalDenom: "azeta",
     coinDecimals: 18,
-    coinGeckoId: "evmos",
+    coinGeckoId: "zetachain",
   },
   bip44: { coinType: 60 },
   bech32Config: {
-    bech32PrefixAccAddr: "evmos",
-    bech32PrefixAccPub: "evmospub",
-    bech32PrefixValAddr: "evmosvaloper",
-    bech32PrefixValPub: "evmosvaloperpub",
-    bech32PrefixConsAddr: "evmosvalcons",
-    bech32PrefixConsPub: "evmosvalconspub",
+    bech32PrefixAccAddr: "zeta",
+    bech32PrefixAccPub: "zetapub",
+    bech32PrefixValAddr: "zetavaloper",
+    bech32PrefixValPub: "zetavaloperpub",
+    bech32PrefixConsAddr: "ezetaalcons",
+    bech32PrefixConsPub: "zetavalconspub",
   },
   currencies: [
     {
-      coinDenom: "EVMOS",
-      coinMinimalDenom: "aevmos",
+      coinDenom: "ZETA",
+      coinMinimalDenom: "azeta",
       coinDecimals: 18,
-      coinGeckoId: "evmos",
+      coinGeckoId: "zetachain",
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: "EVMOS",
-      coinMinimalDenom: "aevmos",
+      coinDenom: "ZETA",
+      coinMinimalDenom: "azeta",
       coinDecimals: 18,
-      coinGeckoId: "evmos",
+      coinGeckoId: "zetachain",
       gasPriceStep: {
-        low: 25000000000,
-        average: 25000000000,
-        high: 40000000000,
+        low: 80000000000,
+        average: 80000000000,
+        high: 80000000000,
       },
     },
   ],
   features: ["eth-address-gen", "eth-key-sign"],
   evm: {
-    chainId: 9001,
-    rpc: "https://evmos-evm-rpc.publicnode.com",
+    chainId: 7000,
+    rpc: "https://evm-zetachain.keplr.app",
   },
 };
-
-export const InjectiveChainInfo = {
-  chainId: "injective-1",
-  chainName: "Injective",
-  rpc: "https://sentry.tm.injective.network:443",
-  rest: "https://sentry.lcd.injective.network:443",
-  stakeCurrency: {
-    coinDenom: "INJ",
-    coinMinimalDenom: "inj",
-    coinDecimals: 18,
-    coinGeckoId: "injective-protocol",
-  },
-  bip44: { coinType: 60 },
-  bech32Config: {
-    bech32PrefixAccAddr: "inj",
-    bech32PrefixAccPub: "injpub",
-    bech32PrefixValAddr: "injvaloper",
-    bech32PrefixValPub: "injvaloperpub",
-    bech32PrefixConsAddr: "injvalcons",
-    bech32PrefixConsPub: "injvalconspub",
-  },
-  currencies: [
-    {
-      coinDenom: "INJ",
-      coinMinimalDenom: "inj",
-      coinDecimals: 18,
-      coinGeckoId: "injective-protocol",
-    },
-  ],
-  feeCurrencies: [
-    {
-      coinDenom: "INJ",
-      coinMinimalDenom: "inj",
-      coinDecimals: 18,
-      coinGeckoId: "injective-protocol",
-      gasPriceStep: { low: 500000000, average: 1000000000, high: 1500000000 },
-    },
-  ],
-  features: ["eth-address-gen", "eth-key-sign"],
-  evm: {
-    chainId: 1, // Injective EVM chainId (실제로 1이 맞음 — 구현 시 Keplr 체인 레지스트리에서 재확인)
-    rpc: "https://sentry.evm-rpc.injective.network",
-  },
-};
-
-export const EthermintChains = [
-  { id: "evmos", label: "Evmos", info: EvmosChainInfo },
-  { id: "injective", label: "Injective", info: InjectiveChainInfo },
-];

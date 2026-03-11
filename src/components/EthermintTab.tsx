@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EthermintChains } from "../constants";
+import { ZetaChainInfo } from "../constants";
 import { BalanceView } from "./ethermint/BalanceView";
 import { CosmosSign } from "./ethermint/CosmosSign";
 import { EvmSign } from "./ethermint/EvmSign";
@@ -7,18 +7,16 @@ import { Eip712Sign } from "./ethermint/Eip712Sign";
 import { SendTokens } from "./ethermint/SendTokens";
 
 export const EthermintTab: React.FC = () => {
-  const [selectedChainId, setSelectedChainId] = useState(EthermintChains[0].id);
-  const selectedChain =
-    EthermintChains.find((c) => c.id === selectedChainId) ?? EthermintChains[0];
+  const chainInfo = ZetaChainInfo;
   const [address, setAddress] = useState("");
   const [hexAddress, setHexAddress] = useState("");
 
   const init = async () => {
     const keplr = window.keplr;
     if (keplr) {
-      await keplr.experimentalSuggestChain(selectedChain.info as any);
-      await keplr.enable(selectedChain.info.chainId);
-      const key = await keplr.getKey(selectedChain.info.chainId);
+      await keplr.experimentalSuggestChain(chainInfo as any);
+      await keplr.enable(chainInfo.chainId);
+      const key = await keplr.getKey(chainInfo.chainId);
       setAddress(key.bech32Address);
       setHexAddress(key.ethereumHexAddress ?? "");
     }
@@ -27,27 +25,16 @@ export const EthermintTab: React.FC = () => {
   return (
     <>
       <h2 style={{ marginTop: "30px" }}>
-        Ethermint Chain ({selectedChain.label})
+        Ethermint Chain ({chainInfo.chainName})
       </h2>
       <div
         className="item-container"
         style={{ maxWidth: 576, overflowWrap: "anywhere" }}
       >
         <div className="item">
-          <div className="item-title">Select Chain</div>
-          <select
-            value={selectedChainId}
-            onChange={(e) => setSelectedChainId(e.target.value)}
-            style={{ padding: "8px", marginRight: "8px" }}
-          >
-            {EthermintChains.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <div className="item-title">Connect</div>
           <button className="keplr-button" onClick={init}>
-            Connect
+            Connect {chainInfo.chainName}
           </button>
         </div>
 
@@ -59,24 +46,18 @@ export const EthermintTab: React.FC = () => {
               <div>Hex: {hexAddress}</div>
             </div>
             <BalanceView
-              chainInfo={selectedChain.info}
+              chainInfo={chainInfo}
               bech32Address={address}
               hexAddress={hexAddress}
             />
-            <CosmosSign
-              chainInfo={selectedChain.info}
-              bech32Address={address}
-            />
+            <CosmosSign chainInfo={chainInfo} bech32Address={address} />
             {hexAddress && (
-              <EvmSign chainInfo={selectedChain.info} hexAddress={hexAddress} />
+              <EvmSign chainInfo={chainInfo} hexAddress={hexAddress} />
             )}
-            <Eip712Sign
-              chainInfo={selectedChain.info}
-              bech32Address={address}
-            />
+            <Eip712Sign chainInfo={chainInfo} bech32Address={address} />
             {hexAddress && (
               <SendTokens
-                chainInfo={selectedChain.info}
+                chainInfo={chainInfo}
                 bech32Address={address}
                 hexAddress={hexAddress}
               />
