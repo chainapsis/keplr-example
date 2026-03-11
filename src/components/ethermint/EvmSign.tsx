@@ -4,31 +4,42 @@ import { Buffer } from "buffer";
 interface Props {
   chainInfo: any;
   hexAddress: string;
+  otherChainInfo?: any;
 }
 
-export const EvmSign: React.FC<Props> = ({ chainInfo, hexAddress }) => {
+export const EvmSign: React.FC<Props> = ({
+  chainInfo,
+  hexAddress,
+  otherChainInfo,
+}) => {
   const [personalSignResult, setPersonalSignResult] = useState("");
   const [sendTxResult, setSendTxResult] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendAmount, setSendAmount] = useState("");
-  const [switched, setSwitched] = useState(false);
+  const [switchedTo, setSwitchedTo] = useState("");
 
-  const switchToChain = async () => {
+  const switchToChain = async (targetInfo: any) => {
     const ethereum = window.keplr?.ethereum;
-    if (!ethereum || !chainInfo.evm) return;
-    const evmChainIdHex = "0x" + chainInfo.evm.chainId.toString(16);
+    if (!ethereum || !targetInfo.evm) return;
+    const evmChainIdHex = "0x" + targetInfo.evm.chainId.toString(16);
     await ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: evmChainIdHex }],
     });
-    setSwitched(true);
+    setSwitchedTo(targetInfo.chainName);
+  };
+
+  const ensureCurrentChain = async () => {
+    if (switchedTo !== chainInfo.chainName) {
+      await switchToChain(chainInfo);
+    }
   };
 
   const personalSign = async () => {
     const ethereum = window.keplr?.ethereum;
     if (!ethereum) return;
     try {
-      if (!switched) await switchToChain();
+      await ensureCurrentChain();
       const message =
         "0x" + Buffer.from("Hello from Ethermint QA test!").toString("hex");
       const result = await ethereum.request({
@@ -47,7 +58,7 @@ export const EvmSign: React.FC<Props> = ({ chainInfo, hexAddress }) => {
     const ethereum = window.keplr?.ethereum;
     if (!ethereum || !sendRecipient) return;
     try {
-      if (!switched) await switchToChain();
+      await ensureCurrentChain();
       const amountWei = BigInt(
         Math.floor(parseFloat(sendAmount || "0") * 1e18)
       ).toString(16);
@@ -67,17 +78,25 @@ export const EvmSign: React.FC<Props> = ({ chainInfo, hexAddress }) => {
     }
   };
 
+  // Switch Chain targets the OTHER chain
+  const switchTarget = otherChainInfo ?? chainInfo;
+
   return (
     <>
       <div className="item">
         <div className="item-title">EVM: Switch Chain</div>
         <div className="item-content">
-          <button className="keplr-button" onClick={switchToChain}>
-            Switch to {chainInfo.chainName} EVM (0x
-            {chainInfo.evm?.chainId.toString(16)})
+          <button
+            className="keplr-button"
+            onClick={() => switchToChain(switchTarget)}
+          >
+            Switch to {switchTarget.chainName} EVM (0x
+            {switchTarget.evm?.chainId.toString(16)})
           </button>
-          {switched && (
-            <div style={{ color: "#16a34a" }}>Switched to EVM chain</div>
+          {switchedTo && (
+            <div style={{ color: "#16a34a" }}>
+              Switched to {switchedTo}
+            </div>
           )}
         </div>
       </div>
