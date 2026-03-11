@@ -188,3 +188,56 @@ export const ZetaChainInfo = {
     rpc: "https://evm-zetachain.keplr.app",
   },
 };
+
+export const XrplEvmChainInfo = {
+  chainId: "xrplevm_1440000-1",
+  chainName: "XRPL EVM",
+  rpc: "https://rpc-xrplevm.keplr.app",
+  rest: "https://lcd-xrplevm.keplr.app",
+  stakeCurrency: {
+    coinDenom: "XRP",
+    coinMinimalDenom: "axrp",
+    coinDecimals: 18,
+    coinGeckoId: "ripple",
+  },
+  bip44: { coinType: 60 },
+  bech32Config: {
+    bech32PrefixAccAddr: "ethm",
+    bech32PrefixAccPub: "ethmpub",
+    bech32PrefixValAddr: "ethmvaloper",
+    bech32PrefixValPub: "ethmvaloperpub",
+    bech32PrefixConsAddr: "ethmvalcons",
+    bech32PrefixConsPub: "ethmvalcons",
+  },
+  currencies: [
+    {
+      coinDenom: "XRP",
+      coinMinimalDenom: "axrp",
+      coinDecimals: 18,
+      coinGeckoId: "ripple",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "XRP",
+      coinMinimalDenom: "axrp",
+      coinDecimals: 18,
+      coinGeckoId: "ripple",
+      gasPriceStep: {
+        low: 200000000000,
+        average: 250000000000,
+        high: 400000000000,
+      },
+    },
+  ],
+  features: ["eth-address-gen", "eth-key-sign"],
+  evm: {
+    chainId: 1440000,
+    rpc: "https://evm-xrplevm.keplr.app",
+  },
+};
+
+export const EthermintChains = [
+  { id: "zetachain", label: "ZetaChain", info: ZetaChainInfo },
+  { id: "xrplevm", label: "XRPL EVM", info: XrplEvmChainInfo },
+];
