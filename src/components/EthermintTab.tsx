@@ -15,6 +15,7 @@ interface ChainState {
 const emptyState: ChainState = { address: "", hexAddress: "", error: "" };
 
 export const EthermintTab: React.FC = () => {
+  const [selectedChainId, setSelectedChainId] = useState(EthermintChains[0].id);
   const [chainStates, setChainStates] = useState<Record<string, ChainState>>(
     () =>
       Object.fromEntries(EthermintChains.map((c) => [c.id, { ...emptyState }]))
@@ -53,77 +54,84 @@ export const EthermintTab: React.FC = () => {
     void connectAll();
   }, [connectAll]);
 
+  const selectedChain =
+    EthermintChains.find((c) => c.id === selectedChainId) ?? EthermintChains[0];
+  const state = chainStates[selectedChainId];
+
   return (
     <>
-      <h2 style={{ marginTop: "30px" }}>Ethermint Chains</h2>
+      <h2 style={{ marginTop: "30px" }}>
+        Ethermint Chain ({selectedChain.label})
+      </h2>
 
-      {EthermintChains.map((chain) => {
-        const state = chainStates[chain.id];
-        return (
-          <div key={chain.id} style={{ marginTop: 24 }}>
-            <h3 style={{ margin: "0 0 12px" }}>{chain.label}</h3>
-
-            <div className="item-container">
-              <div className="item">
-                <div className="item-title">Connection</div>
-                <div className="item-content">
-                  {state.error ? (
-                    <div style={{ color: "#dc2626" }}>Error: {state.error}</div>
-                  ) : state.address ? (
-                    <>
-                      <div>
-                        <span style={{ color: "#6b7280" }}>Bech32:</span>{" "}
-                        <span style={{ fontFamily: "monospace", fontSize: 13 }}>
-                          {state.address}
-                        </span>
-                      </div>
-                      <div>
-                        <span style={{ color: "#6b7280" }}>Hex:</span>{" "}
-                        <span style={{ fontFamily: "monospace", fontSize: 13 }}>
-                          {state.hexAddress}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ color: "#9ca3af" }}>Connecting...</div>
-                  )}
+      <div className="item-container">
+        <div className="item">
+          <div className="item-title">Connection</div>
+          <div className="item-content">
+            <select
+              value={selectedChainId}
+              onChange={(e) => setSelectedChainId(e.target.value)}
+            >
+              {EthermintChains.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            {state.error ? (
+              <div style={{ color: "#dc2626" }}>Error: {state.error}</div>
+            ) : state.address ? (
+              <>
+                <div>
+                  <span style={{ color: "#6b7280" }}>Bech32:</span>{" "}
+                  <span style={{ fontFamily: "monospace", fontSize: 13 }}>
+                    {state.address}
+                  </span>
                 </div>
-              </div>
-
-              {state.address && (
-                <>
-                  <BalanceView
-                    chainInfo={chain.info}
-                    bech32Address={state.address}
-                    hexAddress={state.hexAddress}
-                  />
-                  <CosmosSign
-                    chainInfo={chain.info}
-                    bech32Address={state.address}
-                  />
-                  {state.hexAddress && (
-                    <EvmSign
-                      chainInfo={chain.info}
-                      hexAddress={state.hexAddress}
-                    />
-                  )}
-                  <Eip712Sign
-                    chainInfo={chain.info}
-                    bech32Address={state.address}
-                  />
-                  {state.hexAddress && (
-                    <SendTokens
-                      chainInfo={chain.info}
-                      bech32Address={state.address}
-                      hexAddress={state.hexAddress}
-                    />
-                  )}
-                </>
-              )}
-            </div>
+                <div>
+                  <span style={{ color: "#6b7280" }}>Hex:</span>{" "}
+                  <span style={{ fontFamily: "monospace", fontSize: 13 }}>
+                    {state.hexAddress}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div style={{ color: "#9ca3af" }}>Connecting...</div>
+            )}
           </div>
-        );
-      })}
+        </div>
+
+        {state.address && (
+          <>
+            <BalanceView
+              chainInfo={selectedChain.info}
+              bech32Address={state.address}
+              hexAddress={state.hexAddress}
+            />
+            <CosmosSign
+              chainInfo={selectedChain.info}
+              bech32Address={state.address}
+            />
+            {state.hexAddress && (
+              <EvmSign
+                chainInfo={selectedChain.info}
+                hexAddress={state.hexAddress}
+              />
+            )}
+            <Eip712Sign
+              chainInfo={selectedChain.info}
+              bech32Address={state.address}
+            />
+            {state.hexAddress && (
+              <SendTokens
+                chainInfo={selectedChain.info}
+                bech32Address={state.address}
+                hexAddress={state.hexAddress}
+              />
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };
