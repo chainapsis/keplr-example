@@ -28,7 +28,7 @@ export const CosmosSign: React.FC<Props> = ({ chainInfo, bech32Address }) => {
             type: "cosmos-sdk/MsgSend",
             value: {
               from_address: bech32Address,
-              to_address: bech32Address, // self-send for testing
+              to_address: bech32Address,
               amount: [{ denom, amount: "1" }],
             },
           },
@@ -106,57 +106,70 @@ export const CosmosSign: React.FC<Props> = ({ chainInfo, bech32Address }) => {
     <>
       <div className="item">
         <div className="item-title">Cosmos signAmino (MsgSend)</div>
-        <button className="keplr-button" onClick={signAmino}>
-          Sign Amino
-        </button>
-        {aminoResult && (
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              fontSize: "12px",
-              maxHeight: "200px",
-              overflow: "auto",
-            }}
-          >
-            {aminoResult}
-          </pre>
-        )}
+        <div className="item-content">
+          <button className="keplr-button" onClick={signAmino}>
+            Sign Amino
+          </button>
+          {aminoResult && (
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                fontSize: 12,
+                maxHeight: 200,
+                overflow: "auto",
+                background: "#f5f5f5",
+                padding: 12,
+                borderRadius: 4,
+                margin: 0,
+              }}
+            >
+              {aminoResult}
+            </pre>
+          )}
+        </div>
       </div>
 
       <div className="item">
         <div className="item-title">
           Cosmos signDirect (MsgSend + Broadcast)
         </div>
-        <button className="keplr-button" onClick={signDirect}>
-          Sign Direct & Send
-        </button>
-        {directResult && <div>{directResult}</div>}
+        <div className="item-content">
+          <button className="keplr-button" onClick={signDirect}>
+            Sign Direct & Send
+          </button>
+          {directResult && <div>{directResult}</div>}
+        </div>
       </div>
 
       <div className="item">
         <div className="item-title">ADR-36 Arbitrary Sign</div>
-        <input
-          type="text"
-          placeholder="Message to sign"
-          value={adr36Message}
-          onChange={(e) => setAdr36Message(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-        <button className="keplr-button" onClick={signArbitrary}>
-          Sign Arbitrary
-        </button>
-        {adr36Result && (
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              fontSize: "12px",
-              maxHeight: "200px",
-              overflow: "auto",
-            }}
-          >
-            {adr36Result}
-          </pre>
-        )}
+        <div className="item-content">
+          <input
+            type="text"
+            placeholder="Message to sign"
+            value={adr36Message}
+            onChange={(e) => setAdr36Message(e.target.value)}
+          />
+          <button className="keplr-button" onClick={signArbitrary}>
+            Sign Arbitrary
+          </button>
+          {adr36Result && (
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                fontSize: 12,
+                maxHeight: 200,
+                overflow: "auto",
+                background: "#f5f5f5",
+                padding: 12,
+                borderRadius: 4,
+                margin: 0,
+              }}
+            >
+              {adr36Result}
+            </pre>
+          )}
+        </div>
       </div>
     </>
   );

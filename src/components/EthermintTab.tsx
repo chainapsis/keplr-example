@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { EthermintChains } from "../constants";
 import { BalanceView } from "./ethermint/BalanceView";
 import { CosmosSign } from "./ethermint/CosmosSign";
@@ -6,84 +6,124 @@ import { EvmSign } from "./ethermint/EvmSign";
 import { Eip712Sign } from "./ethermint/Eip712Sign";
 import { SendTokens } from "./ethermint/SendTokens";
 
-export const EthermintTab: React.FC = () => {
-  const [selectedChainId, setSelectedChainId] = useState(EthermintChains[0].id);
-  const selectedChain =
-    EthermintChains.find((c) => c.id === selectedChainId) ?? EthermintChains[0];
-  const [address, setAddress] = useState("");
-  const [hexAddress, setHexAddress] = useState("");
+interface ChainState {
+  address: string;
+  hexAddress: string;
+  error: string;
+}
 
-  const init = async () => {
+const emptyState: ChainState = { address: "", hexAddress: "", error: "" };
+
+export const EthermintTab: React.FC = () => {
+  const [chainStates, setChainStates] = useState<Record<string, ChainState>>(
+    () =>
+      Object.fromEntries(EthermintChains.map((c) => [c.id, { ...emptyState }]))
+  );
+
+  const connectAll = useCallback(async () => {
     const keplr = window.keplr;
-    if (keplr) {
-      await keplr.experimentalSuggestChain(selectedChain.info as any);
-      await keplr.enable(selectedChain.info.chainId);
-      const key = await keplr.getKey(selectedChain.info.chainId);
-      setAddress(key.bech32Address);
-      setHexAddress(key.ethereumHexAddress ?? "");
+    if (!keplr) return;
+
+    for (const chain of EthermintChains) {
+      try {
+        await keplr.experimentalSuggestChain(chain.info as any);
+        await keplr.enable(chain.info.chainId);
+        const key = await keplr.getKey(chain.info.chainId);
+        setChainStates((prev) => ({
+          ...prev,
+          [chain.id]: {
+            address: key.bech32Address,
+            hexAddress: key.ethereumHexAddress ?? "",
+            error: "",
+          },
+        }));
+      } catch (e) {
+        setChainStates((prev) => ({
+          ...prev,
+          [chain.id]: {
+            ...emptyState,
+            error: e instanceof Error ? e.message : String(e),
+          },
+        }));
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void connectAll();
+  }, [connectAll]);
 
   return (
     <>
-      <h2 style={{ marginTop: "30px" }}>
-        Ethermint Chain ({selectedChain.label})
-      </h2>
-      <div
-        className="item-container"
-        style={{ maxWidth: 576, overflowWrap: "anywhere" }}
-      >
-        <div className="item">
-          <div className="item-title">Select Chain</div>
-          <select
-            value={selectedChainId}
-            onChange={(e) => setSelectedChainId(e.target.value)}
-            style={{ padding: "8px", marginRight: "8px" }}
-          >
-            {EthermintChains.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          <button className="keplr-button" onClick={init}>
-            Connect
-          </button>
-        </div>
+      <h2 style={{ marginTop: "30px" }}>Ethermint Chains</h2>
 
-        {address && (
-          <>
-            <div className="item">
-              <div className="item-title">Addresses</div>
-              <div>Bech32: {address}</div>
-              <div>Hex: {hexAddress}</div>
+      {EthermintChains.map((chain) => {
+        const state = chainStates[chain.id];
+        return (
+          <div key={chain.id} style={{ marginTop: 24 }}>
+            <h3 style={{ margin: "0 0 12px" }}>{chain.label}</h3>
+
+            <div className="item-container">
+              <div className="item">
+                <div className="item-title">Connection</div>
+                <div className="item-content">
+                  {state.error ? (
+                    <div style={{ color: "#dc2626" }}>Error: {state.error}</div>
+                  ) : state.address ? (
+                    <>
+                      <div>
+                        <span style={{ color: "#6b7280" }}>Bech32:</span>{" "}
+                        <span style={{ fontFamily: "monospace", fontSize: 13 }}>
+                          {state.address}
+                        </span>
+                      </div>
+                      <div>
+                        <span style={{ color: "#6b7280" }}>Hex:</span>{" "}
+                        <span style={{ fontFamily: "monospace", fontSize: 13 }}>
+                          {state.hexAddress}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ color: "#9ca3af" }}>Connecting...</div>
+                  )}
+                </div>
+              </div>
+
+              {state.address && (
+                <>
+                  <BalanceView
+                    chainInfo={chain.info}
+                    bech32Address={state.address}
+                    hexAddress={state.hexAddress}
+                  />
+                  <CosmosSign
+                    chainInfo={chain.info}
+                    bech32Address={state.address}
+                  />
+                  {state.hexAddress && (
+                    <EvmSign
+                      chainInfo={chain.info}
+                      hexAddress={state.hexAddress}
+                    />
+                  )}
+                  <Eip712Sign
+                    chainInfo={chain.info}
+                    bech32Address={state.address}
+                  />
+                  {state.hexAddress && (
+                    <SendTokens
+                      chainInfo={chain.info}
+                      bech32Address={state.address}
+                      hexAddress={state.hexAddress}
+                    />
+                  )}
+                </>
+              )}
             </div>
-            <BalanceView
-              chainInfo={selectedChain.info}
-              bech32Address={address}
-              hexAddress={hexAddress}
-            />
-            <CosmosSign
-              chainInfo={selectedChain.info}
-              bech32Address={address}
-            />
-            {hexAddress && (
-              <EvmSign chainInfo={selectedChain.info} hexAddress={hexAddress} />
-            )}
-            <Eip712Sign
-              chainInfo={selectedChain.info}
-              bech32Address={address}
-            />
-            {hexAddress && (
-              <SendTokens
-                chainInfo={selectedChain.info}
-                bech32Address={address}
-                hexAddress={hexAddress}
-              />
-            )}
-          </>
-        )}
-      </div>
+          </div>
+        );
+      })}
     </>
   );
 };

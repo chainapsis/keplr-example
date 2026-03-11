@@ -80,44 +80,44 @@ export const SendTokens: React.FC<Props> = ({
   return (
     <div className="item">
       <div className="item-title">Send Native Token</div>
-      <div style={{ marginBottom: "8px" }}>
-        <label style={{ marginRight: "16px" }}>
-          <input
-            type="radio"
-            checked={mode === "cosmos"}
-            onChange={() => setMode("cosmos")}
-          />{" "}
-          Cosmos (bech32 → signDirect)
-        </label>
-        <label>
-          <input
-            type="radio"
-            checked={mode === "evm"}
-            onChange={() => setMode("evm")}
-          />{" "}
-          EVM (hex → eth_sendTransaction)
-        </label>
+      <div className="item-content">
+        <div style={{ display: "flex", gap: 16 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <input
+              type="radio"
+              checked={mode === "cosmos"}
+              onChange={() => setMode("cosmos")}
+            />
+            Cosmos (bech32)
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <input
+              type="radio"
+              checked={mode === "evm"}
+              onChange={() => setMode("evm")}
+            />
+            EVM (hex)
+          </label>
+        </div>
+        <input
+          type="text"
+          placeholder={
+            mode === "cosmos" ? "Recipient (bech32)" : "Recipient (0x...)"
+          }
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder={`Amount (${chainInfo.currencies[0].coinDenom})`}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <button className="keplr-button" onClick={send}>
+          Send ({mode})
+        </button>
+        {result && <div>{result}</div>}
       </div>
-      <input
-        type="text"
-        placeholder={
-          mode === "cosmos" ? "Recipient (bech32)" : "Recipient (0x...)"
-        }
-        value={recipient}
-        onChange={(e) => setRecipient(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "4px" }}
-      />
-      <input
-        type="text"
-        placeholder={`Amount (${chainInfo.currencies[0].coinDenom})`}
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-      />
-      <button className="keplr-button" onClick={send}>
-        Send ({mode})
-      </button>
-      {result && <div>{result}</div>}
     </div>
   );
 };

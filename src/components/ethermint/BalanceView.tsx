@@ -54,7 +54,6 @@ export const BalanceView: React.FC<Props> = ({
   };
 
   const fetchBoth = async () => {
-    // Switch ethereum provider to this chain's EVM first
     if (window.keplr?.ethereum && chainInfo.evm) {
       try {
         await window.keplr.ethereum.request({
@@ -71,11 +70,22 @@ export const BalanceView: React.FC<Props> = ({
   return (
     <div className="item">
       <div className="item-title">Balance Comparison</div>
-      <button className="keplr-button" onClick={fetchBoth}>
-        Fetch Balances
-      </button>
-      {cosmosBalance && <div>Cosmos (bech32): {cosmosBalance}</div>}
-      {evmBalance && <div>EVM (hex): {evmBalance}</div>}
+      <div className="item-content">
+        <button className="keplr-button" onClick={fetchBoth}>
+          Fetch Balances
+        </button>
+        {cosmosBalance && (
+          <div>
+            <span style={{ color: "#6b7280" }}>Cosmos (bech32):</span>{" "}
+            {cosmosBalance}
+          </div>
+        )}
+        {evmBalance && (
+          <div>
+            <span style={{ color: "#6b7280" }}>EVM (hex):</span> {evmBalance}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -22,18 +22,21 @@ const sampleEip712Data = {
   domain: {
     name: "Keplr QA Test",
     version: "1",
-    chainId: 9001, // Will be overridden per chain
+    chainId: 7000,
   },
   message: {
     content: "Hello from Ethermint EIP-712 QA test!",
-    sender: "0x0000000000000000000000000000000000000000", // Will be overridden
+    sender: "0x0000000000000000000000000000000000000000",
   },
 };
 
 export const Eip712Sign: React.FC<Props> = ({ chainInfo, bech32Address }) => {
   const [typedDataJson, setTypedDataJson] = useState(() => {
     const data = { ...sampleEip712Data };
-    data.domain = { ...data.domain, chainId: chainInfo.evm?.chainId ?? 9001 };
+    data.domain = {
+      ...data.domain,
+      chainId: chainInfo.evm?.chainId ?? 7000,
+    };
     return JSON.stringify(data, null, 2);
   });
   const [result, setResult] = useState("");
@@ -60,24 +63,35 @@ export const Eip712Sign: React.FC<Props> = ({ chainInfo, bech32Address }) => {
   return (
     <div className="item">
       <div className="item-title">EIP-712 Sign (keplr.signEthereum)</div>
-      <textarea
-        value={typedDataJson}
-        onChange={(e) => setTypedDataJson(e.target.value)}
-        style={{
-          width: "100%",
-          height: "200px",
-          fontFamily: "monospace",
-          fontSize: "11px",
-          padding: "8px",
-          marginBottom: "8px",
-        }}
-      />
-      <button className="keplr-button" onClick={signEip712}>
-        Sign EIP-712
-      </button>
-      {result && (
-        <div style={{ wordBreak: "break-all", fontSize: "12px" }}>{result}</div>
-      )}
+      <div className="item-content">
+        <textarea
+          value={typedDataJson}
+          onChange={(e) => setTypedDataJson(e.target.value)}
+          style={{
+            height: 200,
+            fontFamily: "monospace",
+            fontSize: 11,
+            resize: "vertical",
+          }}
+        />
+        <button className="keplr-button" onClick={signEip712}>
+          Sign EIP-712
+        </button>
+        {result && (
+          <div
+            style={{
+              wordBreak: "break-all",
+              fontSize: 12,
+              fontFamily: "monospace",
+              background: "#f5f5f5",
+              padding: 12,
+              borderRadius: 4,
+            }}
+          >
+            {result}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

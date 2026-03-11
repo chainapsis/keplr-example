@@ -70,46 +70,61 @@ export const EvmSign: React.FC<Props> = ({ chainInfo, hexAddress }) => {
   return (
     <>
       <div className="item">
-        <div className="item-title">EVM Provider: Switch Chain</div>
-        <button className="keplr-button" onClick={switchToChain}>
-          Switch to {chainInfo.chainName} EVM (0x
-          {chainInfo.evm?.chainId.toString(16)})
-        </button>
-        {switched && <div>✓ Switched</div>}
+        <div className="item-title">EVM: Switch Chain</div>
+        <div className="item-content">
+          <button className="keplr-button" onClick={switchToChain}>
+            Switch to {chainInfo.chainName} EVM (0x
+            {chainInfo.evm?.chainId.toString(16)})
+          </button>
+          {switched && (
+            <div style={{ color: "#16a34a" }}>Switched to EVM chain</div>
+          )}
+        </div>
       </div>
 
       <div className="item">
-        <div className="item-title">EVM Provider: personal_sign</div>
-        <button className="keplr-button" onClick={personalSign}>
-          Personal Sign
-        </button>
-        {personalSignResult && (
-          <div style={{ wordBreak: "break-all", fontSize: "12px" }}>
-            {personalSignResult}
-          </div>
-        )}
+        <div className="item-title">EVM: personal_sign</div>
+        <div className="item-content">
+          <button className="keplr-button" onClick={personalSign}>
+            Personal Sign
+          </button>
+          {personalSignResult && (
+            <div
+              style={{
+                wordBreak: "break-all",
+                fontSize: 12,
+                fontFamily: "monospace",
+                background: "#f5f5f5",
+                padding: 12,
+                borderRadius: 4,
+              }}
+            >
+              {personalSignResult}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="item">
-        <div className="item-title">EVM Provider: eth_sendTransaction</div>
-        <input
-          type="text"
-          placeholder="Recipient (0x...)"
-          value={sendRecipient}
-          onChange={(e) => setSendRecipient(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "4px" }}
-        />
-        <input
-          type="text"
-          placeholder="Amount (in native token, e.g. 0.001)"
-          value={sendAmount}
-          onChange={(e) => setSendAmount(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-        <button className="keplr-button" onClick={sendTransaction}>
-          Send via EVM
-        </button>
-        {sendTxResult && <div>{sendTxResult}</div>}
+        <div className="item-title">EVM: eth_sendTransaction</div>
+        <div className="item-content">
+          <input
+            type="text"
+            placeholder="Recipient (0x...)"
+            value={sendRecipient}
+            onChange={(e) => setSendRecipient(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Amount (in native token, e.g. 0.001)"
+            value={sendAmount}
+            onChange={(e) => setSendAmount(e.target.value)}
+          />
+          <button className="keplr-button" onClick={sendTransaction}>
+            Send via EVM
+          </button>
+          {sendTxResult && <div>{sendTxResult}</div>}
+        </div>
       </div>
     </>
   );
