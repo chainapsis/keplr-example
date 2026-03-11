@@ -24,9 +24,8 @@ export const BalanceView: React.FC<Props> = ({
     const decimals = chainInfo.currencies[0].coinDecimals;
     const balance = data.balances.find((b) => b.denom === nativeDenom);
     if (balance) {
-      const displayDecimals = Math.min(decimals, 6);
       setCosmosBalance(
-        `${new Dec(balance.amount, decimals).toString(displayDecimals)} ${
+        `${new Dec(balance.amount, decimals).toString(decimals)} ${
           chainInfo.currencies[0].coinDenom
         }`
       );
@@ -48,7 +47,7 @@ export const BalanceView: React.FC<Props> = ({
     const integer = wei / divisor;
     const fraction = wei % divisor;
     setEvmBalance(
-      `${integer}.${fraction.toString().padStart(decimals, "0").slice(0, 6)} ${
+      `${integer}.${fraction.toString().padStart(decimals, "0")} ${
         chainInfo.currencies[0].coinDenom
       }`
     );
