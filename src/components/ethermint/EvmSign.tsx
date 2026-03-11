@@ -4,42 +4,28 @@ import { Buffer } from "buffer";
 interface Props {
   chainInfo: any;
   hexAddress: string;
-  otherChainInfo?: any;
 }
 
-export const EvmSign: React.FC<Props> = ({
-  chainInfo,
-  hexAddress,
-  otherChainInfo,
-}) => {
+export const EvmSign: React.FC<Props> = ({ chainInfo, hexAddress }) => {
   const [personalSignResult, setPersonalSignResult] = useState("");
   const [sendTxResult, setSendTxResult] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
   const [sendAmount, setSendAmount] = useState("");
-  const [switchedTo, setSwitchedTo] = useState("");
 
-  const switchToChain = async (targetInfo: any) => {
+  const switchToCurrentChain = async () => {
     const ethereum = window.keplr?.ethereum;
-    if (!ethereum || !targetInfo.evm) return;
-    const evmChainIdHex = "0x" + targetInfo.evm.chainId.toString(16);
+    if (!ethereum || !chainInfo.evm) return;
     await ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: evmChainIdHex }],
+      params: [{ chainId: "0x" + chainInfo.evm.chainId.toString(16) }],
     });
-    setSwitchedTo(targetInfo.chainName);
-  };
-
-  const ensureCurrentChain = async () => {
-    if (switchedTo !== chainInfo.chainName) {
-      await switchToChain(chainInfo);
-    }
   };
 
   const personalSign = async () => {
     const ethereum = window.keplr?.ethereum;
     if (!ethereum) return;
     try {
-      await ensureCurrentChain();
+      await switchToCurrentChain();
       const message =
         "0x" + Buffer.from("Hello from Ethermint QA test!").toString("hex");
       const result = await ethereum.request({
@@ -58,7 +44,7 @@ export const EvmSign: React.FC<Props> = ({
     const ethereum = window.keplr?.ethereum;
     if (!ethereum || !sendRecipient) return;
     try {
-      await ensureCurrentChain();
+      await switchToCurrentChain();
       const amountWei = BigInt(
         Math.floor(parseFloat(sendAmount || "0") * 1e18)
       ).toString(16);
@@ -78,29 +64,8 @@ export const EvmSign: React.FC<Props> = ({
     }
   };
 
-  // Switch Chain targets the OTHER chain
-  const switchTarget = otherChainInfo ?? chainInfo;
-
   return (
     <>
-      <div className="item">
-        <div className="item-title">EVM: Switch Chain</div>
-        <div className="item-content">
-          <button
-            className="keplr-button"
-            onClick={() => switchToChain(switchTarget)}
-          >
-            Switch to {switchTarget.chainName} EVM (0x
-            {switchTarget.evm?.chainId.toString(16)})
-          </button>
-          {switchedTo && (
-            <div style={{ color: "#16a34a" }}>
-              Switched to {switchedTo}
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="item">
         <div className="item-title">EVM: personal_sign</div>
         <div className="item-content">

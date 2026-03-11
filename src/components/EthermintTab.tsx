@@ -116,9 +116,6 @@ export const EthermintTab: React.FC = () => {
               <EvmSign
                 chainInfo={selectedChain.info}
                 hexAddress={state.hexAddress}
-                otherChainInfo={
-                  EthermintChains.find((c) => c.id !== selectedChainId)?.info
-                }
               />
             )}
             <Eip712Sign
