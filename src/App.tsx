@@ -23,6 +23,23 @@ type TabType =
 function App() {
   const [activeTab, setActiveTab] = React.useState<TabType>("osmosis");
 
+  const isExperimental = React.useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get("experimental") === "true";
+  }, []);
+
+  const tabs = React.useMemo(() => {
+    const all = [
+      { id: "osmosis", label: "Osmosis" },
+      { id: "ethermint", label: "Ethermint", experimental: true },
+      { id: "evm", label: "EVM" },
+      { id: "starknet", label: "Starknet" },
+      { id: "bitcoin", label: "Bitcoin" },
+      { id: "deeplink", label: "Deeplink" },
+    ];
+    return all.filter((t) => !t.experimental || isExperimental);
+  }, [isExperimental]);
+
   return (
     <div className="root-container">
       <div
@@ -40,14 +57,7 @@ function App() {
       </div>
 
       <div className="tabs-navigation">
-        {[
-          { id: "osmosis", label: "Osmosis" },
-          { id: "ethermint", label: "Ethermint" },
-          { id: "evm", label: "EVM" },
-          { id: "starknet", label: "Starknet" },
-          { id: "bitcoin", label: "Bitcoin" },
-          { id: "deeplink", label: "Deeplink" },
-        ].map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             className="keplr-button tab-button"
