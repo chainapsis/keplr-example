@@ -1,6 +1,7 @@
 import React from "react";
 
 import { OsmosisTab } from "./components/OsmosisTab";
+import { EthermintTab } from "./components/EthermintTab";
 import { EvmTab } from "./components/EvmTab";
 import { StarknetTab } from "./components/StarknetTab";
 import { BitcoinTab } from "./components/BitcoinTab";
@@ -11,7 +12,13 @@ import "./styles/item.css";
 import "./styles/tabs.css";
 import "./styles/typography.css";
 
-type TabType = "osmosis" | "evm" | "starknet" | "bitcoin" | "deeplink";
+type TabType =
+  | "osmosis"
+  | "ethermint"
+  | "evm"
+  | "starknet"
+  | "bitcoin"
+  | "deeplink";
 
 function App() {
   const [activeTab, setActiveTab] = React.useState<TabType>("osmosis");
@@ -35,6 +42,7 @@ function App() {
       <div className="tabs-navigation">
         {[
           { id: "osmosis", label: "Osmosis" },
+          { id: "ethermint", label: "Ethermint" },
           { id: "evm", label: "EVM" },
           { id: "starknet", label: "Starknet" },
           { id: "bitcoin", label: "Bitcoin" },
@@ -52,6 +60,7 @@ function App() {
       </div>
 
       {activeTab === "osmosis" && <OsmosisTab />}
+      {activeTab === "ethermint" && <EthermintTab />}
       {activeTab === "evm" && <EvmTab />}
       {activeTab === "starknet" && <StarknetTab />}
       {activeTab === "bitcoin" && <BitcoinTab />}

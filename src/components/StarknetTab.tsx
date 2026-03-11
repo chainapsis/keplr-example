@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 
+const STARKNET_ETH_CONTRACT =
+  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
+const STARKNET_STRK_CONTRACT =
+  "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
+
 const chainIdMap = {
   "0x534e5f4d41494e": "SN_MAIN",
   "0x534e5f5345504f4c4941": "SN_SEPOLIA",
@@ -41,6 +46,11 @@ export const StarknetTab: React.FC = () => {
   const [signedTypedData, setSignedTypedData] = useState<string>("");
 
   const [targetChain, setTargetChain] = useState<string>("");
+
+  const [transferToken, setTransferToken] = useState<"ETH" | "STRK">("ETH");
+  const [transferRecipient, setTransferRecipient] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
+  const [transferResult, setTransferResult] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -210,6 +220,41 @@ export const StarknetTab: React.FC = () => {
     }
   };
 
+  const sendStarknetTransfer = async () => {
+    const starknet = window.keplr?.starknet;
+    if (!starknet || !transferRecipient) return;
+    try {
+      const contractAddress =
+        transferToken === "ETH"
+          ? STARKNET_ETH_CONTRACT
+          : STARKNET_STRK_CONTRACT;
+      // Starknet u256: { low, high }. 18 decimals for both ETH and STRK.
+      const amountWei = BigInt(
+        Math.floor(parseFloat(transferAmount || "0") * 1e18)
+      );
+      const low =
+        "0x" +
+        (amountWei & BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")).toString(16);
+      const high = "0x0";
+
+      const result = await starknet.request({
+        type: "wallet_addInvokeTransaction",
+        params: {
+          calls: [
+            {
+              contract_address: contractAddress,
+              entry_point: "transfer",
+              calldata: [transferRecipient, low, high],
+            },
+          ],
+        },
+      });
+      setTransferResult(`TX Hash: ${JSON.stringify(result)}`);
+    } catch (e) {
+      setTransferResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+
   return (
     <>
       <h2 style={{ marginTop: "30px" }}>
@@ -329,6 +374,50 @@ export const StarknetTab: React.FC = () => {
                   {signedTypedData}
                 </pre>
               </div>
+            )}
+          </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">Send Token (invoke transfer)</div>
+          <div className="item-content">
+            <div style={{ marginBottom: "8px" }}>
+              <label style={{ marginRight: "16px" }}>
+                <input
+                  type="radio"
+                  checked={transferToken === "ETH"}
+                  onChange={() => setTransferToken("ETH")}
+                />{" "}
+                ETH
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={transferToken === "STRK"}
+                  onChange={() => setTransferToken("STRK")}
+                />{" "}
+                STRK
+              </label>
+            </div>
+            <input
+              type="text"
+              placeholder="Recipient (0x...)"
+              value={transferRecipient}
+              onChange={(e) => setTransferRecipient(e.target.value)}
+              style={{ width: "100%", padding: "8px", marginBottom: "4px" }}
+            />
+            <input
+              type="text"
+              placeholder="Amount (e.g. 0.001)"
+              value={transferAmount}
+              onChange={(e) => setTransferAmount(e.target.value)}
+              style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
+            />
+            <button className="keplr-button" onClick={sendStarknetTransfer}>
+              Send {transferToken}
+            </button>
+            {transferResult && (
+              <div style={{ wordBreak: "break-all" }}>{transferResult}</div>
             )}
           </div>
         </div>

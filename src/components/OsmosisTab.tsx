@@ -14,7 +14,7 @@ export const OsmosisTab: React.FC = () => {
   const [amount, setAmount] = useState<string>("");
   const [skipSimulation, setSkipSimulation] = useState<boolean>(false);
   const [targetChainId, setTargetChainId] = useState<string>(
-    OsmosisTestnetChainInfo.chainId,
+    OsmosisTestnetChainInfo.chainId
   );
   const [adr36Message, setAdr36Message] = useState<string>("");
   const [adr36Signature, setAdr36Signature] = useState<string>("");
@@ -47,12 +47,12 @@ export const OsmosisTab: React.FC = () => {
         info: OsmosisChainInfo,
       },
     ],
-    [],
+    []
   );
 
   const selectedChain = useMemo(
     () => chains.find((c) => c.id === targetChainId) ?? chains[0],
-    [chains, targetChainId],
+    [chains, targetChainId]
   );
 
   const init = useCallback(async () => {
@@ -101,10 +101,10 @@ export const OsmosisTab: React.FC = () => {
 
       const data = await api<Balances>(uri);
       const balance = data.balances.find(
-        (balance) => balance.denom === "uosmo",
+        (balance) => balance.denom === "uosmo"
       );
       const osmoDecimal = selectedChain.info.currencies.find(
-        (currency) => currency.coinMinimalDenom === "uosmo",
+        (currency) => currency.coinMinimalDenom === "uosmo"
       )?.coinDecimals;
 
       if (balance) {
@@ -148,14 +148,14 @@ export const OsmosisTab: React.FC = () => {
             {
               amount: [{ denom: "uosmo", amount: "236" }],
               gas: defaultGas,
-            },
+            }
           );
         } else {
           const gasUsed = await simulateMsgs(
             selectedChain.info as any,
             key.bech32Address,
             [protoMsgs],
-            [{ denom: "uosmo", amount: "236" }],
+            [{ denom: "uosmo", amount: "236" }]
           );
 
           if (gasUsed) {
@@ -167,7 +167,7 @@ export const OsmosisTab: React.FC = () => {
               {
                 amount: [{ denom: "uosmo", amount: "236" }],
                 gas: Math.floor(gasUsed * 1.5).toString(),
-              },
+              }
             );
           }
         }
@@ -187,7 +187,7 @@ export const OsmosisTab: React.FC = () => {
           const signature = await window.keplr.signArbitrary(
             selectedChain.id,
             key.bech32Address,
-            adr36Message,
+            adr36Message
           );
           setAdr36Signature(
             JSON.stringify(
@@ -196,8 +196,8 @@ export const OsmosisTab: React.FC = () => {
                 pub_key: signature.pub_key,
               },
               null,
-              2,
-            ),
+              2
+            )
           );
         }
       } catch (e) {
@@ -206,6 +206,48 @@ export const OsmosisTab: React.FC = () => {
           setAdr36Signature(`Error: ${e.message}`);
         }
       }
+    }
+  };
+
+  const [aminoSignResult, setAminoSignResult] = useState<string>("");
+
+  const signAminoTest = async () => {
+    if (!window.keplr) return;
+    try {
+      const key = await window.keplr.getKey(selectedChain.id);
+      const signDoc = {
+        chain_id: selectedChain.id,
+        account_number: "0",
+        sequence: "0",
+        fee: { amount: [{ denom: "uosmo", amount: "5000" }], gas: "200000" },
+        msgs: [
+          {
+            type: "cosmos-sdk/MsgSend",
+            value: {
+              from_address: key.bech32Address,
+              to_address: key.bech32Address,
+              amount: [{ denom: "uosmo", amount: "1" }],
+            },
+          },
+        ],
+        memo: "keplr-example signAmino test",
+      };
+      const result = await window.keplr.signAmino(
+        selectedChain.id,
+        key.bech32Address,
+        signDoc
+      );
+      setAminoSignResult(
+        JSON.stringify(
+          { signature: result.signature, signed: result.signed },
+          null,
+          2
+        )
+      );
+    } catch (e) {
+      setAminoSignResult(
+        `Error: ${e instanceof Error ? e.message : String(e)}`
+      );
     }
   };
 
@@ -218,7 +260,6 @@ export const OsmosisTab: React.FC = () => {
 
   useEffect(() => {
     const handleKeyringChange = () => {
-
       fetchAllWallets();
       getKeyFromKeplr();
     };
@@ -377,10 +418,7 @@ export const OsmosisTab: React.FC = () => {
             <div className="item-title">Wallet Management</div>
 
             <div className="item-content">
-              <button
-                className="keplr-button"
-                onClick={fetchAllWallets}
-              >
+              <button className="keplr-button" onClick={fetchAllWallets}>
                 Get All Wallets
               </button>
 
@@ -409,11 +447,28 @@ export const OsmosisTab: React.FC = () => {
                           gap: "8px",
                         }}
                       >
-                        <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-                          <div style={{ fontWeight: wallet.isSelected ? "bold" : "normal", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div
+                          style={{ flex: 1, minWidth: 0, overflow: "hidden" }}
+                        >
+                          <div
+                            style={{
+                              fontWeight: wallet.isSelected ? "bold" : "normal",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
                             {wallet.name} {wallet.isSelected && "(selected)"}
                           </div>
-                          <div style={{ fontSize: "12px", color: "#666", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              color: "#666",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
                             ID: {wallet.id}
                           </div>
                         </div>
@@ -439,25 +494,33 @@ export const OsmosisTab: React.FC = () => {
                           </button>
                         )}
                       </div>
-                      {wallet.addresses && Object.keys(wallet.addresses).length > 0 && (
-                        <div
-                          style={{
-                            marginTop: "8px",
-                            paddingTop: "8px",
-                            borderTop: "1px solid rgba(0,0,0,0.1)",
-                            fontSize: "12px",
-                            fontFamily: "monospace",
-                            wordBreak: "break-all",
-                          }}
-                        >
-                          {Object.entries(wallet.addresses).map(([chainId, addr]) => (
-                            <div key={chainId} style={{ marginBottom: "2px" }}>
-                              <span style={{ color: "#888" }}>{chainId}</span>:{" "}
-                              {addr as string}
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      {wallet.addresses &&
+                        Object.keys(wallet.addresses).length > 0 && (
+                          <div
+                            style={{
+                              marginTop: "8px",
+                              paddingTop: "8px",
+                              borderTop: "1px solid rgba(0,0,0,0.1)",
+                              fontSize: "12px",
+                              fontFamily: "monospace",
+                              wordBreak: "break-all",
+                            }}
+                          >
+                            {Object.entries(wallet.addresses).map(
+                              ([chainId, addr]) => (
+                                <div
+                                  key={chainId}
+                                  style={{ marginBottom: "2px" }}
+                                >
+                                  <span style={{ color: "#888" }}>
+                                    {chainId}
+                                  </span>
+                                  : {addr as string}
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
                     </div>
                   ))}
                 </div>
@@ -526,6 +589,25 @@ export const OsmosisTab: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="item">
+          <div className="item-title">Sign Amino (MsgSend)</div>
+          <button className="keplr-button" onClick={signAminoTest}>
+            Sign Amino
+          </button>
+          {aminoSignResult && (
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                fontSize: "12px",
+                maxHeight: "200px",
+                overflow: "auto",
+              }}
+            >
+              {aminoSignResult}
+            </pre>
+          )}
         </div>
       </div>
     </>

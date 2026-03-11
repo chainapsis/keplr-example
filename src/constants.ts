@@ -140,3 +140,100 @@ export const OsmosisChainInfo = {
     "osmosis-txfees",
   ],
 };
+
+export const EvmosChainInfo = {
+  chainId: "evmos_9001-2",
+  chainName: "Evmos",
+  rpc: "https://evmos-rpc.publicnode.com:443",
+  rest: "https://evmos-rest.publicnode.com",
+  stakeCurrency: {
+    coinDenom: "EVMOS",
+    coinMinimalDenom: "aevmos",
+    coinDecimals: 18,
+    coinGeckoId: "evmos",
+  },
+  bip44: { coinType: 60 },
+  bech32Config: {
+    bech32PrefixAccAddr: "evmos",
+    bech32PrefixAccPub: "evmospub",
+    bech32PrefixValAddr: "evmosvaloper",
+    bech32PrefixValPub: "evmosvaloperpub",
+    bech32PrefixConsAddr: "evmosvalcons",
+    bech32PrefixConsPub: "evmosvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "EVMOS",
+      coinMinimalDenom: "aevmos",
+      coinDecimals: 18,
+      coinGeckoId: "evmos",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "EVMOS",
+      coinMinimalDenom: "aevmos",
+      coinDecimals: 18,
+      coinGeckoId: "evmos",
+      gasPriceStep: {
+        low: 25000000000,
+        average: 25000000000,
+        high: 40000000000,
+      },
+    },
+  ],
+  features: ["eth-address-gen", "eth-key-sign"],
+  evm: {
+    chainId: 9001,
+    rpc: "https://evmos-evm-rpc.publicnode.com",
+  },
+};
+
+export const InjectiveChainInfo = {
+  chainId: "injective-1",
+  chainName: "Injective",
+  rpc: "https://sentry.tm.injective.network:443",
+  rest: "https://sentry.lcd.injective.network:443",
+  stakeCurrency: {
+    coinDenom: "INJ",
+    coinMinimalDenom: "inj",
+    coinDecimals: 18,
+    coinGeckoId: "injective-protocol",
+  },
+  bip44: { coinType: 60 },
+  bech32Config: {
+    bech32PrefixAccAddr: "inj",
+    bech32PrefixAccPub: "injpub",
+    bech32PrefixValAddr: "injvaloper",
+    bech32PrefixValPub: "injvaloperpub",
+    bech32PrefixConsAddr: "injvalcons",
+    bech32PrefixConsPub: "injvalconspub",
+  },
+  currencies: [
+    {
+      coinDenom: "INJ",
+      coinMinimalDenom: "inj",
+      coinDecimals: 18,
+      coinGeckoId: "injective-protocol",
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: "INJ",
+      coinMinimalDenom: "inj",
+      coinDecimals: 18,
+      coinGeckoId: "injective-protocol",
+      gasPriceStep: { low: 500000000, average: 1000000000, high: 1500000000 },
+    },
+  ],
+  features: ["eth-address-gen", "eth-key-sign"],
+  evm: {
+    chainId: 1, // Injective EVM chainId (실제로 1이 맞음 — 구현 시 Keplr 체인 레지스트리에서 재확인)
+    rpc: "https://sentry.evm-rpc.injective.network",
+  },
+};
+
+export const EthermintChains = [
+  { id: "evmos", label: "Evmos", info: EvmosChainInfo },
+  { id: "injective", label: "Injective", info: InjectiveChainInfo },
+];
