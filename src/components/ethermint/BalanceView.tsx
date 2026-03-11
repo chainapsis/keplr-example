@@ -24,8 +24,9 @@ export const BalanceView: React.FC<Props> = ({
     const decimals = chainInfo.currencies[0].coinDecimals;
     const balance = data.balances.find((b) => b.denom === nativeDenom);
     if (balance) {
+      const displayDecimals = Math.min(decimals, 6);
       setCosmosBalance(
-        `${new Dec(balance.amount, decimals).toString(decimals)} ${
+        `${new Dec(balance.amount, decimals).toString(displayDecimals)} ${
           chainInfo.currencies[0].coinDenom
         }`
       );
