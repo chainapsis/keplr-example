@@ -15,7 +15,7 @@ export const StarknetTab: React.FC = () => {
   const [currentChainId, setCurrentChainId] = useState<string>("");
 
   const [tokenAddress, setTokenAddress] = useState<string>(
-    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+    "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
   );
 
   const [typedDataJson, setTypedDataJson] = useState<string>(
@@ -40,8 +40,8 @@ export const StarknetTab: React.FC = () => {
         },
       },
       null,
-      2
-    )
+      2,
+    ),
   );
   const [signedTypedData, setSignedTypedData] = useState<string>("");
 
@@ -61,7 +61,7 @@ export const StarknetTab: React.FC = () => {
           });
           if (chain) {
             setCurrentChainId(
-              `starknet:${chainIdMap[chain as keyof typeof chainIdMap]}`
+              `starknet:${chainIdMap[chain as keyof typeof chainIdMap]}`,
             );
           }
         }
@@ -100,7 +100,7 @@ export const StarknetTab: React.FC = () => {
 
       if (chain) {
         setCurrentChainId(
-          `starknet:${chainIdMap[chain as keyof typeof chainIdMap]}`
+          `starknet:${chainIdMap[chain as keyof typeof chainIdMap]}`,
         );
       }
     } catch (error) {
@@ -215,27 +215,41 @@ export const StarknetTab: React.FC = () => {
     } catch (error) {
       console.error("Failed to sign typed data:", error);
       setSignedTypedData(
-        `오류: ${error instanceof Error ? error.message : String(error)}`
+        `오류: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+  };
+
+  const parseDecimalToBigInt = (value: string, decimals: number): bigint => {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === "0") return BigInt(0);
+    const [intPart, fracPart = ""] = trimmed.split(".");
+    const paddedFrac = fracPart.padEnd(decimals, "0").slice(0, decimals);
+    return BigInt(intPart + paddedFrac);
   };
 
   const sendStarknetTransfer = async () => {
     const starknet = window.keplr?.starknet;
     if (!starknet || !transferRecipient) return;
+
+    const trimmedAmount = (transferAmount || "").trim();
+    if (!trimmedAmount || !/^\d+(\.\d+)?$/.test(trimmedAmount)) {
+      setTransferResult(
+        "Error: Invalid amount. Enter a positive number (e.g. 0.001)",
+      );
+      return;
+    }
+
     try {
       const contractAddress =
         transferToken === "ETH"
           ? STARKNET_ETH_CONTRACT
           : STARKNET_STRK_CONTRACT;
-      // Starknet u256: { low, high }. 18 decimals for both ETH and STRK.
-      const amountWei = BigInt(
-        Math.floor(parseFloat(transferAmount || "0") * 1e18)
-      );
-      const low =
-        "0x" +
-        (amountWei & BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")).toString(16);
-      const high = "0x0";
+      // Starknet u256: { low (u128), high (u128) }. 18 decimals for both ETH and STRK.
+      const amountWei = parseDecimalToBigInt(trimmedAmount, 18);
+      const u128Mask = (BigInt(1) << BigInt(128)) - BigInt(1);
+      const low = "0x" + (amountWei & u128Mask).toString(16);
+      const high = "0x" + (amountWei >> BigInt(128)).toString(16);
 
       const result = await starknet.request({
         type: "wallet_addInvokeTransaction",
