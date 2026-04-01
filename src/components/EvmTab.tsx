@@ -57,7 +57,7 @@ export const EvmTab: React.FC = () => {
     return () => {
       window.removeEventListener(
         "eip6963:announceProvider",
-        handleAnnounceProvider,
+        handleAnnounceProvider
       );
     };
   }, []);
@@ -149,10 +149,7 @@ const WalletManagement: React.FC = () => {
     <div className="item">
       <div className="item-title">Wallet Management</div>
       <div className="item-content">
-        <button
-          className="keplr-button"
-          onClick={fetchAllWallets}
-        >
+        <button className="keplr-button" onClick={fetchAllWallets}>
           Get All Wallets
         </button>
 
@@ -182,10 +179,25 @@ const WalletManagement: React.FC = () => {
                   }}
                 >
                   <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-                    <div style={{ fontWeight: wallet.isSelected ? "bold" : "normal", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div
+                      style={{
+                        fontWeight: wallet.isSelected ? "bold" : "normal",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {wallet.name} {wallet.isSelected && "(selected)"}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#666", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#666",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       ID: {wallet.id}
                     </div>
                   </div>
@@ -211,25 +223,28 @@ const WalletManagement: React.FC = () => {
                     </button>
                   )}
                 </div>
-                {wallet.addresses && Object.keys(wallet.addresses).length > 0 && (
-                  <div
-                    style={{
-                      marginTop: "8px",
-                      paddingTop: "8px",
-                      borderTop: "1px solid rgba(0,0,0,0.1)",
-                      fontSize: "12px",
-                      fontFamily: "monospace",
-                      wordBreak: "break-all",
-                    }}
-                  >
-                    {Object.entries(wallet.addresses).map(([chainId, addr]) => (
-                      <div key={chainId} style={{ marginBottom: "2px" }}>
-                        <span style={{ color: "#888" }}>{chainId}</span>:{" "}
-                        {addr as string}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {wallet.addresses &&
+                  Object.keys(wallet.addresses).length > 0 && (
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        paddingTop: "8px",
+                        borderTop: "1px solid rgba(0,0,0,0.1)",
+                        fontSize: "12px",
+                        fontFamily: "monospace",
+                        wordBreak: "break-all",
+                      }}
+                    >
+                      {Object.entries(wallet.addresses).map(
+                        ([chainId, addr]) => (
+                          <div key={chainId} style={{ marginBottom: "2px" }}>
+                            <span style={{ color: "#888" }}>{chainId}</span>:{" "}
+                            {addr as string}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
               </div>
             ))}
           </div>
@@ -283,7 +298,7 @@ const WalletData: React.FC = () => {
                 {method}
               </button>
             </div>
-          ),
+          )
         )}
         <div>Result: {result}</div>
       </div>
@@ -326,7 +341,7 @@ const RpcData: React.FC = () => {
                 {method}
               </button>
             </div>
-          ),
+          )
         )}
         <div>Result: {result}</div>
       </div>
@@ -486,7 +501,7 @@ const SendNativeToken: React.FC = () => {
 
     const currentChainId = window.keplr?.ethereum?._currentChainId;
     const currentChainInfo = await window.keplr?.getChainInfoWithoutEndpoints(
-      currentChainId,
+      currentChainId
     );
 
     if (currentChainInfo === undefined) {
@@ -498,7 +513,7 @@ const SendNativeToken: React.FC = () => {
     const amountValue = `0x${parseInt(
       new Dec(parsedAmount)
         .mulTruncate(DecUtils.getTenExponentN(mainCurrency.coinDecimals))
-        .toString(),
+        .toString()
     ).toString(16)}`;
 
     const tx = {
@@ -683,7 +698,9 @@ const EIP5792: React.FC = () => {
   const getWalletCapabilities = async () => {
     try {
       setErrors((prev) => ({ ...prev, walletCapabilities: "" }));
-      const capabilities = await client.getCapabilities({});
+      const capabilities = await client.getCapabilities({
+        account: window.keplr?.ethereum?.selectedAddress as `0x${string}`,
+      });
       setWalletCapabilities(capabilities);
     } catch (error) {
       console.error("getWalletCapabilities error:", error);
@@ -720,6 +737,7 @@ const EIP5792: React.FC = () => {
       });
 
       const { id } = await client.sendCalls({
+        account: window.keplr?.ethereum?.selectedAddress as `0x${string}`,
         calls: sendCallsParams,
         chain,
       });
@@ -836,7 +854,7 @@ const EIP5792: React.FC = () => {
   const renderResult = (
     result: any,
     resultKey: string,
-    allowTruncate: boolean = true,
+    allowTruncate: boolean = true
   ) => {
     const showFull = showFullResults[resultKey] || false;
 
@@ -903,7 +921,7 @@ const EIP5792: React.FC = () => {
                   }
                   return value;
                 },
-                2,
+                2
               )}
             </pre>
           </div>
@@ -927,10 +945,10 @@ const EIP5792: React.FC = () => {
   const updateCall = (
     idx: number,
     field: "address" | "amount",
-    value: string,
+    value: string
   ) => {
     setCalls(
-      calls.map((call, i) => (i === idx ? { ...call, [field]: value } : call)),
+      calls.map((call, i) => (i === idx ? { ...call, [field]: value } : call))
     );
   };
 
