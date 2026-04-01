@@ -30,7 +30,7 @@ message ValidatorOutstandingRewardsRecord {
   // validator_address is the address of the validator.
   string validator_address = 1 [(gogoproto.moretags) = "yaml:\"validator_address\""];
 
-  // outstanding_rewards represents the oustanding rewards of a validator.
+  // outstanding_rewards represents the outstanding rewards of a validator.
   repeated cosmos.base.v1beta1.DecCoin outstanding_rewards = 2 [
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
     (gogoproto.nullable)     = false,
@@ -103,7 +103,7 @@ message ValidatorSlashEventRecord {
 
   // validator_address is the address of the validator.
   string validator_address = 1 [(gogoproto.moretags) = "yaml:\"validator_address\""];
-  // height defines the block height at which the slash event occured.
+  // height defines the block height at which the slash event occurred.
   uint64 height = 2;
   // period is the period of the slash event.
   uint64 period = 3;
