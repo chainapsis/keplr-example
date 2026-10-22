@@ -1,6 +1,9 @@
 name: Deployment
 
 on:
+  pull_request:
+    branches:
+      - master
   push:
     branches:
       - master
@@ -10,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 18
+          node-version: "22.23.4"
 
       - name: Enable Corepack
         run: corepack enable
@@ -30,16 +33,19 @@ jobs:
         run: yarn build
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to S3
+        if: github.event_name == 'push'
         run: |
           aws s3 sync build s3://${{ secrets.AWS_S3_BUCKET_NAME }}/
 
       - name: Invalidate CloudFront
+        if: github.event_name == 'push'
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
